@@ -10,7 +10,7 @@ module if_id{
 	/* To Instruction Decipher Stage */
 	output wire[`InstAddrBus]	id_pc,
 	output wire[`InstBus]		id_inst
-}
+};
 
 	always @(posedge) begin
 		if (rst == `RstEnable) begin

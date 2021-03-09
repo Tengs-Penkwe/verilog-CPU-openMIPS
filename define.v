@@ -8,6 +8,7 @@
 `define ReadDisable 1'b0
 `define AluOpBus 7:0			//ALUop_o width in the Instruction Decipher Stage
 `define AluSelBus 2:0			//ALUsel_o with in ID stage
+//Mind this, valid if 1`b0
 `define InstValid 1'b0			//Valid Instruction
 `define InstInvalid 1'b1
 `define True_v 1'b1				
@@ -18,7 +19,6 @@
 //************* Macro about specific instruction ************
 `define EXE_ORI			6'b001101		//ori -> 6'op:rs:rt:16'imm
 `define EXE_NOP			6'b000000		//nop
-
 
 //AluOp
 `define EXE_OR_OP		8'b00100101
