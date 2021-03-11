@@ -31,7 +31,7 @@
 //*************** Macro about ROM (instruction inside) ************
 `define InstAddrBus		31:0		//Width of Address Bus of ROM
 `define InstBus			31:0		//Width of Data Bus of ROM
-`define InstMemNum		131071		//Actual Size is 128KiB
+`define InstMemNum		131072		//Actual Size is 128KiB
 `define InstMemNumLog2	17			//Actual Address Bus Width
 
 //*************** Macro about General Register Regfile ************

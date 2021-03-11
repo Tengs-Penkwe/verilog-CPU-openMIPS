@@ -1,4 +1,5 @@
-module id{
+`include "defines.v"
+module id(
 	input wire					rst,
 
 	//Read Instruction from IF_ID
@@ -26,10 +27,10 @@ module id{
 	//Which Reg to write
 	output reg[`RegAddrBus]		wd_o,
 	output reg					wreg_o
-};
+);
 
 	/* Get Opration Code */
-	wire [5:0] op1 = inst_i[31:26];
+	wire [5:0] op = inst_i[31:26];
 		//funct(5) in R-inst
 	wire [4:0] op2 = inst_i[10:6];
 		//funct(6) in R-inst
@@ -83,7 +84,7 @@ module id{
 
 			case(op)
 				`EXE_ORI: begin
-				//op1(31~26):	001101
+				//op(31~26):	001101
 				//rs(25:21):	Source Regfile
 				//rt(20:16):	Target Regfile, used as Destination in I-inst
 				//imm(15:0);	Zero Extended

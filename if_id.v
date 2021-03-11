@@ -1,4 +1,5 @@
-module if_id{
+`include "defines.v"
+module if_id(
 	input wire		clk,
 	input wire		rst,
 
@@ -8,14 +9,14 @@ module if_id{
 	input wire[`InstBus]		if_inst,
 
 	/* To Instruction Decipher Stage */
-	output wire[`InstAddrBus]	id_pc,
-	output wire[`InstBus]		id_inst
-};
+	output reg[`InstAddrBus]	id_pc,
+	output reg[`InstBus]		id_inst
+);
 
-	always @(posedge) begin
+	always @(posedge clk) begin
 		if (rst == `RstEnable) begin
+			id_pc	<= `ZeroWord;
 			id_inst <= `ZeroWord;
-			if_inst <= `ZeroWord;
 		end else begin
 			id_pc   <= if_pc;
 			id_inst <= if_inst;
