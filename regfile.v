@@ -1,3 +1,4 @@
+`include "defines.v"
 module regfile(
 	//Only for write back
 	input wire				clk,
@@ -16,7 +17,7 @@ module regfile(
 
 	output reg[`RegBus]		rdata1,
 	output reg[`RegBus]		rdata2
-),
+);
 
 	/********************* 1. Define Registers ********************
 	* There are 32 common registers, each of them are general purpose
@@ -65,3 +66,5 @@ module regfile(
 			rdata2			<= `ZeroWord;
 		end
 	end		//always
+
+endmodule

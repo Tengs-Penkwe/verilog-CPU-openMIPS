@@ -1,3 +1,4 @@
+`include "defines.v"
 module ex(
 	input wire				rst,
 
@@ -28,7 +29,7 @@ module ex(
 		if (rst==`RstEnable) begin
 			logicout		<= `ZeroWord; 
 		end else begin
-			case (aluop_i) begin
+			case (aluop_i) 
 				`EXE_OR_OP: begin
 					logicout<= reg1_i | reg2_i;
 				end
@@ -47,12 +48,13 @@ module ex(
 	always @(*) begin
 		wd_o			<= wd_i;
 		wreg_o			<= wreg_i;
-		case (alusel_i) begin
+		case (alusel_i)
 			`EXE_RES_LOGIC: begin
 				wdata_o	<= logicout;
 			end
 			default: begin
 				wdata_o	<= `ZeroWord;
+			end
 		endcase
 	end
 

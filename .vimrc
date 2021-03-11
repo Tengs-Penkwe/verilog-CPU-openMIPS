@@ -1,0 +1,1 @@
+/Users/penkwe/.config/nvim/init.vim
