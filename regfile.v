@@ -51,7 +51,7 @@ module regfile(
 		end else begin
 			rdata1			<= `ZeroWord;
 		end
-	end		//always
+	end
 
 	always @(*) begin
 		if (rst==`RstEnable) begin
@@ -65,6 +65,6 @@ module regfile(
 		end else begin
 			rdata2			<= `ZeroWord;
 		end
-	end		//always
+	end
 
 endmodule

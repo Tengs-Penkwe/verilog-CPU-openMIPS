@@ -13,6 +13,8 @@ module openmips_min_sopc_tb();
 	end
 
 	initial begin
+//		$dumpfile("Regfile.vcd");
+//		$dumpvars(0,regfile1);
 		$dumpfile("Sim_openMIPS.vcd");
 		$dumpvars(0,openmips_min_sopc0);
 				rst = `RstEnable;
