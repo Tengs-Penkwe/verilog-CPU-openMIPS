@@ -37,8 +37,8 @@ module ex(
 					logicout<= `ZeroWord;
 				end
 			endcase
-		end		//if
-	end			//always
+		end
+	end
 
 	/********************* 1.Do ALU Operation due to aluop_i *************
 	* The ALU will do multiple operation at the same time, this can

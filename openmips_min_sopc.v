@@ -4,7 +4,7 @@ module openmips_min_sopc(
 	input wire			rst
 );
 
-	wire[`RegBus]		inst;
+	wire[`InstBus]		inst;
 	wire[`InstAddrBus]	inst_addr;
 	wire				rom_ce;
 
