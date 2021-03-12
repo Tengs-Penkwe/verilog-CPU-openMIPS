@@ -1,4 +1,10 @@
-ori $1,$0,0x1100
-ori $2,$0,0x0020
-ori $3,$0,0xff00
-ori $4,$0,0xffff
+	.org 0x0
+	.set noat
+	.set noreorder
+	.set nomacro
+.global _start
+_start:
+	ori $1,$0,0x1100
+	ori $2,$0,0x0020
+	ori $3,$0,0xff00
+	ori $4,$0,0xffff
