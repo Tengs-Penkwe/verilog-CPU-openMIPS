@@ -9,8 +9,8 @@ LOGFLAGS		=	-Wall
 SIM				=	vvp
 SIMFLAGS		=	
 
-$(TARGET): 
-	$(LOG) $(LOGFLAGS) -o $@ -s $(TOP)  $(SRCS)
+$(TARGET): $(SRCS)
+	$(LOG) $(LOGFLAGS) -o $@ -s $(TOP) $^
 
 sim: $(TARGET)
 	$(SIM) $(SIMFLAGS) $(TARGET)

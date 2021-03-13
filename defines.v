@@ -33,6 +33,7 @@
 `define InstBus			31:0		//Width of Data Bus of ROM
 `define InstMemNum		131072		//Actual Size is 128KiB
 `define InstMemNumLog2	17			//Actual Address Bus Width
+`define ByteWidth		8
 
 //*************** Macro about General Register Regfile ************
 `define RegAddrBus 4:0				//Regfile Address Bus Width
@@ -43,3 +44,4 @@
 `define RegNum 32					//Number of G-Regs 2^5=32
 `define RegNumLog2 5				
 `define NOPRegAddr 5'b00000			//Reg r0 === 0, for special utility
+
