@@ -49,6 +49,28 @@ module id(
 	* to other stage
 	***************************************************************/
 	
+	//*************** Function-like Macro for OP decode ************
+	`define SET_INST(i_aluop, i_alusel, i_re1, i_reg1_addr, i_re2, i_reg2_addr, i_we, i_waddr, i_imm, i_inst_valid) if(1) begin \
+		aluop_o       <=  i_aluop       ; \
+		alusel_o      <=  i_alusel      ; \
+		reg1_re_o     <=  i_re1         ; \
+		reg1_addr_o   <=  i_reg1_addr   ; \
+		reg2_re_o     <=  i_re2         ; \
+		reg2_addr_o   <=  i_reg2_addr   ; \
+		we_o          <=  i_we          ; \
+		waddr_o       <=  i_waddr       ; \
+		imm           <=  i_imm         ; \
+		inst_valid    <=  i_inst_valid  ; \
+	end else if(0)
+	
+	`define SET_BRANCH(i_branch_flag, i_branch_target_addr, i_link_addr, i_next_in_delay_slot) if(1) begin \
+		branch_flag_o         <=  i_branch_flag         ; \
+		branch_addr_o         <=  i_branch_target_addr  ; \
+		link_addr_o           <=  i_link_addr           ; \
+		next_in_delay_slot_o  <=  i_next_in_delay_slot  ; \
+	end else if(0)
+
+
 	always @(*) begin
 		if(rst==`RstEnable) begin
 			//Reg to read
@@ -88,6 +110,8 @@ module id(
 				//rs(25:21):	Source Regfile
 				//rt(20:16):	Target Regfile, used as Destination in I-inst
 				//imm(15:0);	Zero Extended
+					aluop_o			<= `EXE_OR_OP;
+					alusel_o		<= `EXE_RES_LOGIC;
 					wd_o			<= inst_i[20:16];
 					imm				<= {16'h0,inst_i[15:0]};
 					
@@ -95,8 +119,6 @@ module id(
 					reg1_read_o		<= `ReadEnable;
 					reg2_read_o		<= `ReadDisable;
 					
-					aluop_o			<= `EXE_OR_OP;
-					alusel_o		<= `EXE_RES_LOGIC;
 
 					instvalid		<= `InstValid;
 					end
@@ -133,5 +155,8 @@ module id(
 			reg2_o		<= `ZeroWord;
 		end
 	end
+
+    `undef SET_INST
+    `undef SET_BRANCH
 
 endmodule

@@ -67,8 +67,4 @@ module regfile(
 		end
 	end
 
-	initial begin
-		$monitor("at time %3t,Regfile:0=%h,1=%h,2=%h\n",$time,regs[0],regs[1],regs[2],);
-	end
-
 endmodule
