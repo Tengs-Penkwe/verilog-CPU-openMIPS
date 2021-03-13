@@ -44,6 +44,7 @@ module regfile(
 			rdata1			<= `ZeroWord;
 		end else if (raddr1==`RegNumLog2'h0) begin
 			rdata1			<= `ZeroWord;
+		//Prevent Data Hazard for RAW (two inst.s)
 		end else if ((raddr1==waddr) && (re1==`ReadEnable) && (we==`WriteEnable)) begin
 			rdata1			<= wdata;
 		end else if (re1==`ReadEnable) begin

@@ -15,5 +15,8 @@ $(TARGET): $(SRCS)
 sim: $(TARGET)
 	$(SIM) $(SIMFLAGS) $(TARGET)
 
+wave: sim
+	$(shell /Applications/gtkwave.app/Contents/Resources/bin/gtkwave dump.vcd)
+
 clean:
 	@rm -f $(TARGET)

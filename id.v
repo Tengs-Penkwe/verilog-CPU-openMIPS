@@ -9,6 +9,16 @@ module id(
 	//Read Data from Regfile
 	input wire[`RegBus]			reg1_data_i,			
 	input wire[`RegBus]			reg2_data_i,			
+
+	/********** Data Forward **********/ 
+	input wire					ex_wreg_i,
+	input wire[`RegBus]			ex_wdata_i,
+	input wire[`RegAddrBus]		ex_wd_i,
+	input wire					mem_wreg_i,
+	input wire[`RegBus]			mem_wdata_i,
+	input wire[`RegAddrBus]		mem_wd_i,
+	/********** Data Forward **********/ 
+
 	
 	//Send Information to Regfile
 	output reg[`RegAddrBus]		reg1_addr_o,
@@ -50,7 +60,7 @@ module id(
 	***************************************************************/
 	
 	//*************** Function-like Macro for OP decode ************
-	`define SET_INST(i_aluop, i_alusel, i_re1, i_reg1_addr, i_re2, i_reg2_addr, i_we, i_waddr, i_imm, i_inst_valid) if(1) begin \
+	`define SET_INST(i_aluop, i_alusel, i_re1, i_reg1_addr, i_re2, i_reg2_addr, i_we, i_waddr, i_imm, i_inst_valid)  \
 		aluop_o       <=  i_aluop       ; \
 		alusel_o      <=  i_alusel      ; \
 		reg1_re_o     <=  i_re1         ; \
@@ -61,14 +71,12 @@ module id(
 		waddr_o       <=  i_waddr       ; \
 		imm           <=  i_imm         ; \
 		inst_valid    <=  i_inst_valid  ; \
-	end else if(0)
 	
-	`define SET_BRANCH(i_branch_flag, i_branch_target_addr, i_link_addr, i_next_in_delay_slot) if(1) begin \
+	`define SET_BRANCH(i_branch_flag, i_branch_target_addr, i_link_addr, i_next_in_delay_slot) \
 		branch_flag_o         <=  i_branch_flag         ; \
 		branch_addr_o         <=  i_branch_target_addr  ; \
 		link_addr_o           <=  i_link_addr           ; \
 		next_in_delay_slot_o  <=  i_next_in_delay_slot  ; \
-	end else if(0)
 
 
 	always @(*) begin
@@ -135,6 +143,10 @@ module id(
 	always @(*) begin
 		if(rst==`RstEnable) begin
 			reg1_o		<= `ZeroWord;
+		end else if((reg1_read_o==1`b1) && (ex_wreg_i==1`b1) && (reg1_addr_o==ex_wd_i))begin
+			reg1_o		<= `ex_wdata_i;
+		end else if((reg1_read_o==1`b1) && (mem_wreg_i==1`b1) && (reg1_addr_o==mem_wd_i))begin
+			reg1_o		<= `mem_wdata_i;
 		end else if(reg1_read_o == `ReadEnable) begin
 			reg1_o 		<= reg1_data_i;
 		end else if(reg1_read_o == `ReadDisable) begin
@@ -147,6 +159,10 @@ module id(
 	always @(*) begin
 		if(rst==`RstEnable) begin
 			reg2_o		<= `ZeroWord;
+		end else if((reg2_read_o==1`b1) && (ex_wreg_i==1`b1) && (reg2_addr_o==ex_wd_i))begin
+			reg2_o		<= `ex_wdata_i;
+		end else if((reg2_read_o==1`b1) && (mem_wreg_i==1`b1) && (reg2_addr_o==mem_wd_i))begin
+			reg2_o		<= `mem_wdata_i;
 		end else if(reg2_read_o == `ReadEnable) begin
 			reg2_o 		<= reg2_data_i;
 		end else if(reg2_read_o == `ReadDisable) begin

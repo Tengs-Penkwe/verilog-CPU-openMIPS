@@ -32,3 +32,5 @@ SECTIONS
 
 	/DISCARD/ : { *(.MIPS.abiflags) }
 }
+
+ENTRY (_start)
