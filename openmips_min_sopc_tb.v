@@ -18,13 +18,14 @@ module openmips_min_sopc_tb();
 	end
 
 	genvar i;		//dump registers
-	for (i = 0; i < 4; i = i + 1) initial $dumpvars(0,openmips_min_sopc0.openmips0.regfile1.regs[i]);
+	for (i = 0; i < 12; i = i + 1) initial $dumpvars(0,openmips_min_sopc0.openmips0.regfile1.regs[i]);
 
 	initial begin
 		$readmemh ("./TestAsm/inst_rom.data",openmips_min_sopc0.openmips0.inst_rom0.inst_mem);
+		$dumpvars(0,openmips_min_sopc0);
 				rst = `RstEnable;
 		#195 	rst = `RstDisable;
-		#1000 	$stop;
+		#1000 	$finish;
 	end
 
 
