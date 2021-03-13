@@ -12,7 +12,10 @@ SIMFLAGS		=
 $(TARGET): $(SRCS)
 	$(LOG) $(LOGFLAGS) -o $@ -s $(TOP) $^
 
-sim: $(TARGET)
+asm:
+	make -C asm/
+
+sim: $(TARGET) asm
 	$(SIM) $(SIMFLAGS) $(TARGET)
 
 wave: sim
