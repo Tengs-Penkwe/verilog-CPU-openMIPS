@@ -18,7 +18,7 @@ module openmips_min_sopc_tb();
 	end
 
 	genvar i;		//dump registers
-	for (i = 0; i < 4; i = i + 1) initial $dumpvars(0,openmips_min_sopc0.openmips0.regfile1.regs[i]);
+	for (i = 0; i < 8; i = i + 1) initial $dumpvars(0,openmips_min_sopc0.openmips0.regfile1.regs[i]);
 
 	initial begin
 		$readmemh ("./asm/inst_rom.data",openmips_min_sopc0.openmips0.inst_rom0.inst_mem);

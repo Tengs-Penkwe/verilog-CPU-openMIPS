@@ -28,6 +28,12 @@ module regfile(
 	/********************* 2.Write Data Back ********************
 	* Write what we get from the last stage
 	***************************************************************/
+
+	initial begin
+		for (integer i=0;i<=31;i=i+1)
+			regs[i] = 32'h0;
+	end
+
 	always @(posedge clk) begin
 		if (rst==`RstDisable) begin
 			if((we==`WriteEnable) && (waddr!=`RegNumLog2'h0))begin

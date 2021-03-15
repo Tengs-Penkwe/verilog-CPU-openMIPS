@@ -19,12 +19,14 @@ module ex(
 	
 	/********************* Save The Result of Operation *************/
 	reg[`RegBus]			logicout;
+	reg[`RegBus]			shiftres;
 
-	/********************* 1.Do ALU Operation due to aluop_i *************
-	* The ALU will do multiple operation at the same time, this can
-	* simlify the design of circuit, then we choose what result we
-	* need in the next stage
+	/***************** 1.Do ALU Operation due to aluop_i *************
+	* The ALU will do multiple operation at the same time, this can simplify the design
+	* of circuit, then we choose what result we need in the next stage
 	***************************************************************/
+
+	//1.1 Logical Operation
 	always @(*) begin
 		if (rst==`RstEnable) begin
 			logicout		<= `ZeroWord; 
@@ -33,6 +35,15 @@ module ex(
 				`EXE_OR_OP: begin
 					logicout<= reg1_i | reg2_i;
 				end
+				`EXE_AND_OP: begin
+					logicout<= reg1_i & reg2_i;
+				end
+				`EXE_NOR_OP: begin
+					logicout<= ~(reg1_i|reg2_i);
+				end
+				`EXE_XOR_OP: begin
+					logicout<= reg1_i ^ reg2_i;
+				end
 				default: begin
 					logicout<= `ZeroWord;
 				end
@@ -40,10 +51,28 @@ module ex(
 		end
 	end
 
-	/********************* 1.Do ALU Operation due to aluop_i *************
-	* The ALU will do multiple operation at the same time, this can
-	* simlify the design of circuit, then we choose what result we
-	* need in the next stage
+	//1.2 Shift Operation
+	always @(*) begin
+		if (rst==`RstEnable) begin
+			shiftres		<= `ZeroWord; 
+		end else begin
+			case (aluop_i) 
+				`EXE_SLL_OP: begin
+					shiftres<= reg2_i << reg1_i[4:0];
+				end
+				`EXE_SRL_OP: begin
+					shiftres<= reg2_i >> reg1_i[4:0];
+				end
+				`EXE_SRA_OP: begin
+					shiftres<= ({32{reg2_i[31]}} << (6'd32-{1'b0,reg1_i[4:0]})) | (reg2_i>>reg1_i[4:0]);
+				end
+				default: begin
+					shiftres<= `ZeroWord;
+				end
+			endcase
+		end
+	end
+	/***************** 2.Select Result due to aluop_i *************
 	***************************************************************/
 	always @(*) begin
 		wd_o			<= wd_i;
@@ -52,7 +81,10 @@ module ex(
 			`EXE_RES_LOGIC: begin
 				wdata_o	<= logicout;
 			end
-			default: begin
+			`EXE_RES_SHIFT: begin
+				wdata_o <= shiftres;
+			end
+			default:		begin
 				wdata_o	<= `ZeroWord;
 			end
 		endcase
