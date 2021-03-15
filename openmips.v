@@ -79,11 +79,12 @@ module openmips(
 	id id0(
 		.rst(rst),
 		.pc_i(id_pc_i),				.inst_i(id_inst_i),
+		//From Regfiles
 		.reg1_data_i(reg1_data),	.reg2_data_i(reg2_data),
-		//Data to Regfiles
+		//To Regfiles
 		.reg1_addr_o(reg1_addr),	.reg2_addr_o(reg2_addr),
 		.reg1_read_o(reg1_read),	.reg2_read_o(reg2_read),
-		//Data to ID/EX
+		//To ID/EX
 		.aluop_o(id_aluop_o),		.alusel_o(id_alusel_o),
 		.reg1_o(id_reg1_o),			.reg2_o(id_reg2_o),
 		.wd_o(id_wd_o),				.wreg_o(id_wreg_o),
@@ -96,10 +97,13 @@ module openmips(
 
 	regfile regfile1(
 		.rst(rst),		.clk(clk),
+		//From ID
 		.re1(reg1_read),			.re2(reg2_read),
 		.raddr1(reg1_addr),			.raddr2(reg2_addr),
+		//From WB
 		.we(wb_wreg_i),
 		.waddr(wb_wd_i),			.wdata(wb_wdata_i),
+		//To ID
 		.rdata1(reg1_data),			.rdata2(reg2_data)
 	);
 

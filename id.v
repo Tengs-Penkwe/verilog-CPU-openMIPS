@@ -51,7 +51,7 @@ module id(
 		//rt(5) in R,I
 		wire [4:0] rt		= inst_i[20:16];
 		//rd(5) in R,I,J
-		wire [4:0] rd		= inst_i[15:10];
+		wire [4:0] rd		= inst_i[15:11];
 		//Sign-extended Imm
 		wire [31:0] sgn_imm	= {{16{inst_i[15]}}, inst_i[15:0]};
 		//Zero-extended Imm
@@ -59,7 +59,8 @@ module id(
 
 	/* Immediate Number */
 	reg [`RegBus] imm ;
-
+		wire [`RegBus] sa	= {27'h0,shamt[4:0]};
+	
 	/* State */
 	reg 	inst_valid;
 
@@ -89,36 +90,50 @@ module id(
 		next_in_delay_slot_o  <=  i_next_in_delay_slot  ; \
 	end else if(0)
 
-
 	always @(*) begin 
 		if(rst==`RstEnable) begin 
 			`SET_INST(`EXE_NOP_OP,`EXE_RES_NOP,`ReadDisable,`NOPRegAddr,`ReadDisable,`NOPRegAddr,`WriteDisable,`NOPRegAddr,`ZeroWord,`InstValid);
 			//Mind this ! valide (1'b0) and it's nop
 		end else begin
-			`SET_INST(`EXE_NOP_OP,`EXE_RES_NOP,`ReadDisable,inst_i[25:21],`ReadDisable,inst_i[20:16],`WriteDisable,inst_i[15:11],`ZeroWord,`InstInvalid);
-			case(op)  
-				`EXE_ORI:`SET_INST(`EXE_OR_OP, `EXE_RES_LOGIC,`ReadEnable,inst_i[25:21],`ReadDisable,`NOPRegAddr,`WriteEnable,inst_i[20:16],{16'h0,inst_i[15:0]},`InstValid);
-					//op(31~26):001101		//rs(25:21):src		rt(20:16):target as dst		//imm(15:0):Zero Extended
-				default: begin
-					end
-			endcase
+			`SET_INST(`EXE_NOP_OP,`EXE_RES_NOP,0,rs,0,rt,0,rd,`ZeroWord,1);
+			case(op) 					//op(31~26)
+				`EXE_SPEC_INST:	begin	//op(31~26):5'0 indicates special instruction
+					case(funct)
+						`EXE_OR:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_AND:	`SET_INST(`EXE_AND_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_XOR:	`SET_INST(`EXE_XOR_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_NOR:	`SET_INST(`EXE_NOR_OP, 	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_SLLV:	`SET_INST(`EXE_SLL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_SRLV:	`SET_INST(`EXE_SRL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_SRAV:	`SET_INST(`EXE_SRA_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
+						//sa != 0
+						`EXE_SYNC:	`SET_INST(`EXE_NOP_OP,	`EXE_RES_NOP,  0,rs,0,rt,0,rd,0 ,0);
+							//This will cause reg2_read_o to be 1 after reset, but it's ok
+						`EXE_SLL:	`SET_INST(`EXE_SLL_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
+						`EXE_SRL:	`SET_INST(`EXE_SRL_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
+						`EXE_SRA:	`SET_INST(`EXE_SRA_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
+					endcase		//case(funct)
+				end				//`EXE_SPEC_INST
+				`EXE_ORI:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,1,rs,0,rt,1,rt,zro_imm,0);
+				`EXE_ANDI:	`SET_INST(`EXE_AND_OP,	`EXE_RES_LOGIC,1,rs,0,rt,1,rt,zro_imm,0);
+				`EXE_XORI:	`SET_INST(`EXE_XOR_OP,	`EXE_RES_LOGIC,1,rs,0,rt,1,rt,zro_imm,0);
+				`EXE_LUI:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,0,rs,0,rt,1,rt,{inst_i[15:0],16'h0},0);
+				`EXE_PERF:	`SET_INST(`EXE_NOP_OP,	`EXE_RES_NOP  ,0,rs,0,rt,0,rd,0 ,0);
+			endcase	//case(op)
 		end			//if
 	end				//always
 
-	/********************* 2.Get the Source Operators ********************
-	* In this Stage, we get the operators(rs,rt) from Regfiles
-	***************************************************************/
-
-	always @(*) begin
+	/********************* 2.Get the Source Operators ********************/
+		always @(*) begin
 		if(rst==`RstEnable) begin
 			reg1_o		<= `ZeroWord;
 		end else if((reg1_read_o==1'b1) && (ex_wreg_i==1'b1) && (reg1_addr_o==ex_wd_i)) begin
 			reg1_o		<= ex_wdata_i;
 		end else if((reg1_read_o==1'b1) && (mem_wreg_i==1'b1) && (reg1_addr_o==mem_wd_i)) begin
 			reg1_o		<= mem_wdata_i;
-		end else if(reg1_read_o == `ReadEnable) begin
+		end else if(reg1_read_o == 1'b1) begin
 			reg1_o 		<= reg1_data_i;
-		end else if(reg1_read_o == `ReadDisable) begin
+		end else if(reg1_read_o == 1'b0) begin
 			reg1_o 		<= imm;
 		end else begin
 			reg1_o		<= `ZeroWord;
@@ -132,9 +147,9 @@ module id(
 			reg2_o		<= ex_wdata_i;
 		end else if((reg2_read_o==1'b1) && (mem_wreg_i==1'b1) && (reg2_addr_o==mem_wd_i)) begin
 			reg2_o		<= mem_wdata_i;
-		end else if(reg2_read_o == `ReadEnable) begin
+		end else if(reg2_read_o == 1'b1) begin
 			reg2_o 		<= reg2_data_i;
-		end else if(reg2_read_o == `ReadDisable) begin
+		end else if(reg2_read_o == 1'b0) begin
 			reg2_o 		<= imm;
 		end else begin
 			reg2_o		<= `ZeroWord;

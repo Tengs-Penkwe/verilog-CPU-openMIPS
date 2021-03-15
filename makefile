@@ -9,13 +9,13 @@ LOGFLAGS		=	-Wall
 SIM				=	vvp
 SIMFLAGS		=	
 
-$(TARGET): $(SRCS)
+$(TARGET): $(SRCS) asm
 	$(LOG) $(LOGFLAGS) -o $@ -s $(TOP) $^
 
 asm:
 	make -C asm/
 
-sim: $(TARGET) asm
+sim: $(TARGET) 
 	$(SIM) $(SIMFLAGS) $(TARGET)
 
 wave: sim
