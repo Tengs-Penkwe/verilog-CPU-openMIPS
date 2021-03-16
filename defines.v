@@ -28,7 +28,7 @@
 // Register Instruction
 `define EXE_SPEC_INST	6'b000000
 `define EXE_NOP			6'b000000		//nop -> 6'0:5'0:5'0:5'0:5'0:6'0
-
+		//SLL, NOP, SSNOP
 `define EXE_SLL			6'b000000		//sll -> 6'0:5'0:rt:rd:sa:6'fnc
 `define EXE_SRL			6'b000010		//srl -> 6'0:5'0:rt:rd:sa:6'fnc
 `define EXE_SRA			6'b000011		//sra -> 6'0:5'0:rt:rd:sa:6'fnc
@@ -42,6 +42,13 @@
 `define EXE_NOR			6'b100111		//nor -> 6'0:rs:rt:rd:5'0:6'fnc
 
 `define EXE_SYNC		6'b001111		//sync-> 6'0:rs:rt:rd:5'0:6'fnc
+
+`define EXE_MOVZ		6'b001010		//movz-> 6'0:rs:rt:rd:5'0:6'fnc
+`define EXE_MOVN		6'b001011		//movn-> 6'0:rs:rt:rd:5'0:6'fnc
+`define EXE_MFHI		6'b010000		//mfhi-> 6'0:5'0:5'0:rd:5'0:6'fnc
+`define EXE_MTHI		6'b010001		//mthi-> 6'0:5'0:5'0:rd:5'0:6'fnc
+`define EXE_MFLO		6'b010010		//mflo-> 6'0:rs:5'0:5'0:5'0:6'fnc
+`define EXE_MTLO		6'b010011		//mtlo-> 6'0:rs:5'0:5'0:5'0:6'fnc
 
 //AluOp
 `define EXE_NOP_OP		8'b00000000
@@ -62,10 +69,18 @@
 `define EXE_SRA_OP		8'b00000011
 `define EXE_SRAV_OP		8'b00000111
 
+`define EXE_MOVZ_OP		8'b00001010
+`define EXE_MOVN_OP		8'b00001011
+`define EXE_MFHI_OP		8'b00010000
+`define EXE_MTHI_OP		8'b00010001
+`define EXE_MFLO_OP		8'b00010010
+`define EXE_MTLO_OP		8'b00010011
+
 //AluSel
 `define EXE_RES_NOP		3'b000
 `define EXE_RES_LOGIC	3'b001
 `define EXE_RES_SHIFT	3'b010
+`define EXE_RES_MOVE	3'b010
 
 //*************** Macro about ROM (instruction inside) ************
 `define InstAddrBus		31:0		//Width of Address Bus of ROM

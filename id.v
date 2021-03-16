@@ -99,10 +99,17 @@ module id(
 			case(op) 					//op(31~26)
 				`EXE_SPEC_INST:	begin	//op(31~26):5'0 indicates special instruction
 					case(funct)
+						`EXE_MFHI:	`SET_INST(`EXE_MFHI_OP,	`EXE_RES_MOVE, 0,rs,0,rt,1,rd,0 ,0);
+						`EXE_MFLO:	`SET_INST(`EXE_MFLO_OP,	`EXE_RES_MOVE, 0,rs,0,rt,1,rd,0 ,0);
+						`EXE_MTHI:	`SET_INST(`EXE_MTHI_OP,	`EXE_RES_NOP,  1,rs,0,rt,0,rd,0 ,0);
+						`EXE_MTLO:	`SET_INST(`EXE_MTLO_OP,	`EXE_RES_NOP,  1,rs,0,rt,0,rd,0 ,0);
+						`EXE_MOVN:	`SET_INST(`EXE_MOVN_OP,	`EXE_RES_MOVE,)
+
 						`EXE_OR:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_AND:	`SET_INST(`EXE_AND_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_XOR:	`SET_INST(`EXE_XOR_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_NOR:	`SET_INST(`EXE_NOR_OP, 	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
+
 						`EXE_SLLV:	`SET_INST(`EXE_SLL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_SRLV:	`SET_INST(`EXE_SRL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_SRAV:	`SET_INST(`EXE_SRA_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);

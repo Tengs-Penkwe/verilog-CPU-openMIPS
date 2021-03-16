@@ -21,11 +21,11 @@ module openmips_min_sopc_tb();
 	for (i = 0; i < 8; i = i + 1) initial $dumpvars(0,openmips_min_sopc0.openmips0.regfile1.regs[i]);
 
 	initial begin
-		$readmemh ("./asm/inst_rom.data",openmips_min_sopc0.openmips0.inst_rom0.inst_mem);
+		$readmemh ("inst_rom.data",openmips_min_sopc0.openmips0.inst_rom0.inst_mem);
 		$dumpvars(0,openmips_min_sopc0);
 				rst = `RstEnable;
-		#55 	rst = `RstDisable;
-		#400 	$finish;
+		#25 	rst = `RstDisable;
+		#500 	$finish;
 	end
 
 

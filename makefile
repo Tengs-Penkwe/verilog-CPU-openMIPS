@@ -15,7 +15,7 @@ $(TARGET): $(SRCS) asm
 asm:
 	make -C asm/
 
-sim: $(TARGET) 
+sim: $(TARGET) asm
 	$(SIM) $(SIMFLAGS) $(TARGET)
 
 wave: sim
