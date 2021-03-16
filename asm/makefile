@@ -22,6 +22,7 @@ inst_rom.asm: inst_rom.om
 	$(OBJDUMP) -D $< > $@
 inst_rom.data: inst_rom.bin
 	./Bin2Mem -o $@ $<
+	cp $@ ../
 
 clean:
 	rm -f *.o *.om *.bin *.data *.mif *.asm
