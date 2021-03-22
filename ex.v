@@ -167,6 +167,24 @@ module ex(
 	end				//always
 
 	//2.4 Arithmetic Operation
+		//Substraction or Signed Comparsion 
+		//reg2_i_mux = 2's complement of second operator
+		assign reg2_i_mux = ((aluop_i == `EXE_SUB_OP)	||
+							 (aluop_i == `EXE_SUBU_OP)	||
+							 (aluop_i == `EXE_SLT_OP))	?
+							 (~reg2_i)+1 : reg2_i;
+		/** Result of Add, Sub, Signed Comparison **/
+		assign result_sum = reg1_i + reg2_i_mux;
+		assign reg1_i_not = ~reg1_i;
+		/** Calculate Overflow **/
+		assign ov_sum = ( (!reg1_i[31] && !reg2_i_mux[31]) && result_sum[31])	||
+						(  (reg1_i[31] && reg2_i_mux[31]) && !result_sum[31]);
+		assign reg1_lt_reg2 = ((aluop_i == `EXE_SLT_OP)) 	?
+							  ((reg1_i[31] && !reg2_i[31])						||
+							  (!reg1_i[31] && !reg2_i[31] && result_sum[31]) 	||
+							  (reg1_i[31] && reg2_i[31] && !result_sum[31]))
+							: (reg1_i < reg2_i);
+
 	always @(*) begin
 		if (rst==`RstEnable) begin
 			arithmeticres	<= `ZeroWord;
@@ -209,25 +227,7 @@ module ex(
 		end			//if
 	end				//always
 
-	//2.5 Substraction or Signed Comparsion 
-		//reg2_i_mux = 2's complement of second operator
-		assign reg2_i_mux = ((aluop_i == `EXE_SUB_OP)	||
-							 (aluop_i == `EXE_SUBU_OP)	||
-							 (aluop_i == `EXE_SLT_OP))	?
-							 (~reg2_i)+1 : reg2_i;
-		/** Result of Add, Sub, Signed Comparison **/
-		assign result_sum = reg1_i + reg2_i_mux;
-		assign reg1_i_not = ~reg1_i;
-		/** Calculate Overflow **/
-		assign ov_sum = ( (!reg1_i[31] && !reg2_i_mux[31]) && result_sum[31])	||
-						(  (reg1_i[31] && reg2_i_mux[31]) && !result_sum[31]);
-		assign reg1_lt_reg2 = ((aluop_i == `EXE_SLT_OP)) 	?
-							  ((reg1_i[31] && !reg2_i[31])						||
-							  (!reg1_i[31] && !reg2_i[31] && result_sum[31]) 	||
-							  (reg1_i[31] && reg2_i[31] && !result_sum[31]))
-							: (reg1_i < reg2_i);
-
-	//2.6 Multiplication 
+	//2.5 Multiplication 
 		assign multiplicand = (((aluop_i==`EXE_MUL_OP)||(aluop_i==`EXE_MULT_OP)) && (reg1_i[31])) ?
 								(~reg1_i + 1) : reg1_i;
 		assign multipler	= (((aluop_i==`EXE_MUL_OP)||(aluop_i==`EXE_MULT_OP)) && (reg2_i[31])) ?
@@ -255,7 +255,7 @@ module ex(
 		if (((aluop_i==`EXE_ADD_OP)||(aluop_i==`EXE_ADDI_OP)||(aluop_i==`EXE_SUB_OP)) && (ov_sum==1'b1)) begin
 			wreg_o 		<= `WriteDisable;
 		end else begin
-			wreg_o			<= wreg_i;
+			wreg_o		<= wreg_i;
 		end
 		case (alusel_i)
 			`EXE_RES_LOGIC: begin
