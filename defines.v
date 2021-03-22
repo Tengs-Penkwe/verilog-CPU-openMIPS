@@ -17,6 +17,7 @@
 `define ChipDisable 1'b0
 
 //************* Macro about specific instruction ************
+//********** Opcode 31~26 **********//
 // Immediate Instruction
 `define EXE_ORI			6'b001101		//ori -> 6'op:rs:rt:16'imm
 `define EXE_ANDI		6'b001100		//andi-> 6'op:rs:rt:16'imm
@@ -25,10 +26,18 @@
 
 `define EXE_PERF		6'b110011		//perf-> 6'op:5'bs:5'ht:16'off
 
+`define EXE_ADDI		6'b001000
+`define EXE_ADDIU		6'b001001
+`define EXE_SLTI		6'b001010
+`define EXE_SLTIU		6'b001011
 // Register Instruction
+
+
+//********** Funct 5~0 **********//
+//Special 1 => 6'b000000
 `define EXE_SPEC_INST	6'b000000
-`define EXE_NOP			6'b000000		//nop -> 6'0:5'0:5'0:5'0:5'0:6'0
-		//SLL, NOP, SSNOP
+`define EXE_NOP			6'b000000		//nop -> 6'0:5'0:5'0:5'0:5'0:6'0			 //SLL, NOP, SSNOP
+		
 `define EXE_SLL			6'b000000		//sll -> 6'0:5'0:rt:rd:sa:6'fnc
 `define EXE_SRL			6'b000010		//srl -> 6'0:5'0:rt:rd:sa:6'fnc
 `define EXE_SRA			6'b000011		//sra -> 6'0:5'0:rt:rd:sa:6'fnc
@@ -50,7 +59,23 @@
 `define EXE_MFLO		6'b010010		//mflo-> 6'0:rs:5'0:5'0:5'0:6'fnc
 `define EXE_MTLO		6'b010011		//mtlo-> 6'0:rs:5'0:5'0:5'0:6'fnc
 
-//AluOp
+`define EXE_ADD			6'b100000
+`define EXE_ADDU		6'b100001
+`define EXE_SUB			6'b100010
+`define EXE_SUBU		6'b100011
+`define EXE_SLT			6'b101010
+`define EXE_SLTU		6'b101011
+
+`define EXE_MULT		6'b011000
+`define EXE_MULTU		6'b011001
+//Special 2 000000=> 6'b011100
+`define EXE_SPEC2_INST	6'b011100
+`define EXE_MUL			6'b000010
+
+`define EXE_CLZ			6'b100000
+`define EXE_CLO			6'b100001
+
+//********** AluOp **********//
 `define EXE_NOP_OP		8'b00000000
 
 `define EXE_AND_OP		8'b00100100
@@ -76,11 +101,30 @@
 `define EXE_MFLO_OP		8'b00010010
 `define EXE_MTLO_OP		8'b00010011
 
+`define EXE_SLT_OP		8'b00101010
+`define EXE_SLTU_OP		8'b00101011
+`define EXE_SLTI_OP		8'b01010111
+`define EXE_SLTIU_OP	8'b01011000
+`define EXE_ADD_OP		8'b00100000
+`define EXE_ADDU_OP		8'b00100001
+`define EXE_SUB_OP		8'b00100010
+`define EXE_SUBU_OP		8'b00100011
+`define EXE_ADDI_OP		8'b01010101
+`define EXE_ADDIU_OP	8'b01010110
+`define EXE_CLZ_OP		8'b10110000
+`define EXE_CLO_OP		8'b10110001
+
+`define EXE_MULT_OP		8'b00011000
+`define EXE_MULTU_OP	8'b00011001
+`define EXE_MUL_OP		8'b10101001
+
 //AluSel
 `define EXE_RES_NOP		3'b000
 `define EXE_RES_LOGIC	3'b001
 `define EXE_RES_SHIFT	3'b010
-`define EXE_RES_MOVE	3'b010
+`define EXE_RES_MOVE	3'b011
+`define EXE_RES_ARITH	3'b100
+`define EXE_RES_MUL		3'b101
 
 //*************** Macro about ROM (instruction inside) ************
 `define InstAddrBus		31:0		//Width of Address Bus of ROM

@@ -19,7 +19,6 @@ module id(
 	input wire[`RegAddrBus]		mem_wd_i,
 	/********** Data Forward **********/ 
 
-	
 	//Send Information to Regfile
 	output reg[`RegAddrBus]		reg1_addr_o,
 	output reg[`RegAddrBus]		reg2_addr_o,
@@ -99,33 +98,55 @@ module id(
 			case(op) 					//op(31~26)
 				`EXE_SPEC_INST:	begin	//op(31~26):5'0 indicates special instruction
 					case(funct)
-						`EXE_MFHI:	`SET_INST(`EXE_MFHI_OP,	`EXE_RES_MOVE, 0,rs,0,rt,1,rd,0 ,0);
-						`EXE_MFLO:	`SET_INST(`EXE_MFLO_OP,	`EXE_RES_MOVE, 0,rs,0,rt,1,rd,0 ,0);
-						`EXE_MTHI:	`SET_INST(`EXE_MTHI_OP,	`EXE_RES_NOP,  1,rs,0,rt,0,rd,0 ,0);
-						`EXE_MTLO:	`SET_INST(`EXE_MTLO_OP,	`EXE_RES_NOP,  1,rs,0,rt,0,rd,0 ,0);
-						`EXE_MOVN:	`SET_INST(`EXE_MOVN_OP,	`EXE_RES_MOVE,)
+							//This will cause reg2_read_o to be 1 after reset, but it's ok
+						`EXE_SLL:	`SET_INST(`EXE_SLL_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
+						`EXE_SRL:	`SET_INST(`EXE_SRL_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
+						`EXE_SRA:	`SET_INST(`EXE_SRA_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
+						`EXE_SLLV:	`SET_INST(`EXE_SLL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_SRLV:	`SET_INST(`EXE_SRL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
+						`EXE_SRAV:	`SET_INST(`EXE_SRA_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
 
 						`EXE_OR:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_AND:	`SET_INST(`EXE_AND_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_XOR:	`SET_INST(`EXE_XOR_OP,	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
 						`EXE_NOR:	`SET_INST(`EXE_NOR_OP, 	`EXE_RES_LOGIC,1,rs,1,rt,1,rd,0 ,0);
-
-						`EXE_SLLV:	`SET_INST(`EXE_SLL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
-						`EXE_SRLV:	`SET_INST(`EXE_SRL_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
-						`EXE_SRAV:	`SET_INST(`EXE_SRA_OP,	`EXE_RES_SHIFT,1,rs,1,rt,1,rd,0 ,0);
-						//sa != 0
+							//sa != 0
 						`EXE_SYNC:	`SET_INST(`EXE_NOP_OP,	`EXE_RES_NOP,  0,rs,0,rt,0,rd,0 ,0);
-							//This will cause reg2_read_o to be 1 after reset, but it's ok
-						`EXE_SLL:	`SET_INST(`EXE_SLL_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
-						`EXE_SRL:	`SET_INST(`EXE_SRL_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
-						`EXE_SRA:	`SET_INST(`EXE_SRA_OP,	`EXE_RES_SHIFT,0,rs,1,rt,1,rd,sa,0);
+
+						`EXE_MTHI:	`SET_INST(`EXE_MTHI_OP,	`EXE_RES_NOP,  1,rs,0,rt,0,rd,0 ,0);
+						`EXE_MTLO:	`SET_INST(`EXE_MTLO_OP,	`EXE_RES_NOP,  1,rs,0,rt,0,rd,0 ,0);
+						`EXE_MFHI:	`SET_INST(`EXE_MFHI_OP,	`EXE_RES_MOVE, 0,rs,0,rt,1,rd,0 ,0);
+						`EXE_MFLO:	`SET_INST(`EXE_MFLO_OP,	`EXE_RES_MOVE, 0,rs,0,rt,1,rd,0 ,0);
+						`EXE_MOVN:	`SET_INST(`EXE_MOVN_OP,	`EXE_RES_MOVE, 1,rs,1,rt,reg2_o!=0,rd,0,0);
+						`EXE_MOVZ:	`SET_INST(`EXE_MOVZ_OP,	`EXE_RES_MOVE, 1,rs,1,rt,reg2_o==0,rd,0,0);
+							
+						`EXE_ADD:	`SET_INST(`EXE_ADD_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
+						`EXE_ADDU:	`SET_INST(`EXE_ADDU_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
+						`EXE_SUB:	`SET_INST(`EXE_SUB_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
+						`EXE_SUBU:	`SET_INST(`EXE_SUBU_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
+						`EXE_SLT:	`SET_INST(`EXE_SLT_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
+						`EXE_SLTU:	`SET_INST(`EXE_SLTU_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
+						`EXE_MULT:	`SET_INST(`EXE_MULT_OP,	`EXE_RES_NOP  ,1,rs,1,rt,0,rd,0	,0);	
+						`EXE_MULTU:	`SET_INST(`EXE_MULTU_OP,`EXE_RES_NOP  ,1,rs,1,rt,0,rd,0	,0);	
 					endcase		//case(funct)
 				end				//`EXE_SPEC_INST
+				`EXE_SPEC2_INST: begin
+					case(funct)
+						`EXE_CLZ:	`SET_INST(`EXE_CLZ_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rd,0 ,0);
+						`EXE_CLO:	`SET_INST(`EXE_CLO_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rd,0 ,0);
+						`EXE_MUL:	`SET_INST(`EXE_MUL_OP,	`EXE_RES_MUL,  1,rs,1,rt,1,rd,0 ,0);
+					endcase		
+				end				//`EXE_SPEC2_INST
 				`EXE_ORI:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,1,rs,0,rt,1,rt,zro_imm,0);
 				`EXE_ANDI:	`SET_INST(`EXE_AND_OP,	`EXE_RES_LOGIC,1,rs,0,rt,1,rt,zro_imm,0);
 				`EXE_XORI:	`SET_INST(`EXE_XOR_OP,	`EXE_RES_LOGIC,1,rs,0,rt,1,rt,zro_imm,0);
 				`EXE_LUI:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,0,rs,0,rt,1,rt,{inst_i[15:0],16'h0},0);
 				`EXE_PERF:	`SET_INST(`EXE_NOP_OP,	`EXE_RES_NOP  ,0,rs,0,rt,0,rd,0 ,0);
+
+				`EXE_ADDI:	`SET_INST(`EXE_ADDI_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
+				`EXE_ADDIU:	`SET_INST(`EXE_ADDIU_OP,`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
+				`EXE_SLTI:	`SET_INST(`EXE_SLTI_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
+				`EXE_SLTIU:	`SET_INST(`EXE_SLTIU_OP,`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
 			endcase	//case(op)
 		end			//if
 	end				//always

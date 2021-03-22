@@ -11,7 +11,6 @@ module openmips_min_sopc_tb();
 		.rst(rst)
 	);
 
-
 	initial begin
 		CLOCK_50 = 1'b0;
 		forever #10 CLOCK_50 = ~CLOCK_50;
@@ -27,7 +26,5 @@ module openmips_min_sopc_tb();
 		#25 	rst = `RstDisable;
 		#500 	$finish;
 	end
-
-
 
 endmodule
