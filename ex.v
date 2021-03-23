@@ -32,7 +32,6 @@ module ex(
 	output reg[`RegBus]		hi_o,
 	output reg[`RegBus]		lo_o,
 	output reg				whilo_o
-
 );
 	
 	/********************* Save The Result of Operation *************/
@@ -182,7 +181,7 @@ module ex(
 		assign reg1_lt_reg2 = ((aluop_i == `EXE_SLT_OP)) 	?
 							  ((reg1_i[31] && !reg2_i[31])						||
 							  (!reg1_i[31] && !reg2_i[31] && result_sum[31]) 	||
-							  (reg1_i[31] && reg2_i[31] && !result_sum[31]))
+							  (reg1_i[31] && reg2_i[31] && result_sum[31]))
 							: (reg1_i < reg2_i);
 
 	always @(*) begin

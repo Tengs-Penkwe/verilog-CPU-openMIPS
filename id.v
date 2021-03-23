@@ -145,14 +145,14 @@ module id(
 
 				`EXE_ADDI:	`SET_INST(`EXE_ADDI_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
 				`EXE_ADDIU:	`SET_INST(`EXE_ADDIU_OP,`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
-				`EXE_SLTI:	`SET_INST(`EXE_SLTI_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
-				`EXE_SLTIU:	`SET_INST(`EXE_SLTIU_OP,`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
+				`EXE_SLTI:	`SET_INST(`EXE_SLT_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
+				`EXE_SLTIU:	`SET_INST(`EXE_SLTU_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
 			endcase	//case(op)
 		end			//if
 	end				//always
 
 	/********************* 2.Get the Source Operators ********************/
-		always @(*) begin
+	always @(*) begin
 		if(rst==`RstEnable) begin
 			reg1_o		<= `ZeroWord;
 		end else if((reg1_read_o==1'b1) && (ex_wreg_i==1'b1) && (reg1_addr_o==ex_wd_i)) begin
