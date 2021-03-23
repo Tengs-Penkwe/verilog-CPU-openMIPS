@@ -21,7 +21,6 @@ module id_ex(
 
 	output reg[`RegAddrBus]	ex_wd,
 	output reg				ex_wreg
-	
 );
 
 	always @(posedge clk) begin
@@ -41,6 +40,5 @@ module id_ex(
 			ex_wreg			<= id_wreg;
 		end
 	end
-
 
 endmodule

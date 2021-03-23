@@ -98,18 +98,18 @@ module openmips(
 		.pc_i(id_pc_i),				.inst_i(id_inst_i),
 		//From Regfiles
 		.reg1_data_i(reg1_data),	.reg2_data_i(reg2_data),
+		/* Data Forward */
+		.ex_wdata_i(ex_wdata_o),	.ex_wd_i(ex_wd_o),
+		.ex_wreg_i(ex_wreg_o),
+		.mem_wdata_i(mem_wdata_o),	.mem_wd_i(mem_wd_o),
+		.mem_wreg_i(mem_wreg_o),
 		//To Regfiles
 		.reg1_addr_o(reg1_addr),	.reg2_addr_o(reg2_addr),
 		.reg1_read_o(reg1_read),	.reg2_read_o(reg2_read),
 		//To ID/EX
 		.aluop_o(id_aluop_o),		.alusel_o(id_alusel_o),
 		.reg1_o(id_reg1_o),			.reg2_o(id_reg2_o),
-		.wd_o(id_wd_o),				.wreg_o(id_wreg_o),
-		/* Data Forward */
-		.ex_wdata_i(ex_wdata_o),	.ex_wd_i(ex_wd_o),
-		.ex_wreg_i(ex_wreg_o),
-		.mem_wdata_i(wb_wdata_i),	.mem_wd_i(wb_wd_i),
-		.mem_wreg_i(wb_wreg_i)
+		.wd_o(id_wd_o),				.wreg_o(id_wreg_o)
 	);
 
 	regfile regfile1(
