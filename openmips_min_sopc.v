@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `include "defines.v"
 module openmips_min_sopc(
 	input wire			clk,

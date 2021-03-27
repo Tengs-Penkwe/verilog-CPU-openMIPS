@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `include "defines.v"
 module id_ex(
 	input wire				clk,
@@ -13,6 +14,9 @@ module id_ex(
 	input wire[`RegAddrBus]	id_wd,
 	input wire				id_wreg,
 
+	/* From Control */
+	input wire[5:0]			stall,
+
 	output reg[`AluSelBus]	ex_alusel,
 	output reg[`AluOpBus]	ex_aluop,
 
@@ -24,21 +28,21 @@ module id_ex(
 );
 
 	always @(posedge clk) begin
-		if (rst==`RstEnable) begin
+		if (rst==`RstEnable || (stall[2] == `Stop && stall[3] == `NoStop)) begin
 			ex_alusel		<= `EXE_RES_NOP;
 			ex_aluop		<= `EXE_NOP_OP;
 			ex_reg1			<= `ZeroWord;
 			ex_reg2			<= `ZeroWord;
 			ex_wd			<= `NOPRegAddr;
 			ex_wreg			<= `WriteDisable;
-		end else begin
+		end else if (stall[2] == `NoStop ) begin
 			ex_alusel		<= id_alusel;
 			ex_aluop		<= id_aluop;
 			ex_reg1			<= id_reg1;
 			ex_reg2			<= id_reg2;
 			ex_wd			<= id_wd;
 			ex_wreg			<= id_wreg;
-		end
+		end 
 	end
 
 endmodule
