@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `include "defines.v"
 module id(
 	input wire					rst,
@@ -35,7 +36,11 @@ module id(
 
 	//Which Reg to write
 	output reg[`RegAddrBus]		wd_o,
-	output reg					wreg_o
+	output reg					wreg_o,
+
+	/* To Control Module */
+	output wire					stallreq
+
 );
 
 	/* Get Opration Code */
@@ -63,6 +68,9 @@ module id(
 	/* State */
 	reg 	inst_valid;
 
+	/* Stall Request */
+	assign stallreq = `NoStop;
+
 	/********************* 1.Instruction Decipher ********************
 	* In this Stage, OP1(31~26) is read, then we send instruction 
 	* to other stage
@@ -89,6 +97,7 @@ module id(
 		next_in_delay_slot_o  <=  i_next_in_delay_slot  ; \
 	end else if(0)
 
+	/* InstValid Decipher */
 	always @(*) begin 
 		if(rst==`RstEnable) begin 
 			`SET_INST(`EXE_NOP_OP,`EXE_RES_NOP,`ReadDisable,`NOPRegAddr,`ReadDisable,`NOPRegAddr,`WriteDisable,`NOPRegAddr,`ZeroWord,`InstValid);
@@ -132,9 +141,15 @@ module id(
 				end				//`EXE_SPEC_INST
 				`EXE_SPEC2_INST: begin
 					case(funct)
+						`EXE_MUL:	`SET_INST(`EXE_MUL_OP,	`EXE_RES_MUL,  1,rs,1,rt,1,rd,0 ,0);
+
 						`EXE_CLZ:	`SET_INST(`EXE_CLZ_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rd,0 ,0);
 						`EXE_CLO:	`SET_INST(`EXE_CLO_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rd,0 ,0);
-						`EXE_MUL:	`SET_INST(`EXE_MUL_OP,	`EXE_RES_MUL,  1,rs,1,rt,1,rd,0 ,0);
+							//AluSel can also be `EXE_RES_NOP since we don't write general registers
+						`EXE_MADD:	`SET_INST(`EXE_MADD_OP,	`EXE_RES_MUL,  1,rs,1,rt,0,rd,0 ,0);
+						`EXE_MADDU:	`SET_INST(`EXE_MADDU_OP,`EXE_RES_MUL,  1,rs,1,rt,0,rd,0 ,0);
+						`EXE_MSUB:	`SET_INST(`EXE_MSUB_OP,	`EXE_RES_MUL,  1,rs,1,rt,0,rd,0 ,0);
+						`EXE_MSUBU:	`SET_INST(`EXE_MSUBU_OP,`EXE_RES_MUL,  1,rs,1,rt,0,rd,0 ,0);
 					endcase		
 				end				//`EXE_SPEC2_INST
 				`EXE_ORI:	`SET_INST(`EXE_OR_OP,	`EXE_RES_LOGIC,1,rs,0,rt,1,rt,zro_imm,0);

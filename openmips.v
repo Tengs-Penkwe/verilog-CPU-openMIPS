@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 `include "defines.v"
 module openmips(
 	input wire				rst,
@@ -49,6 +50,8 @@ module openmips(
 	wire					ex_whilo_o;
 	wire[`RegBus]			ex_hi_o;
 	wire[`RegBus]			ex_lo_o;
+	wire[`DoubleRegBus]		hilo_temp_o;
+	wire[1:0] 				cnt_o;
 
 	//EX/MEM -> MEM
 	wire					mem_wreg_i;
@@ -57,6 +60,8 @@ module openmips(
 	wire					mem_whilo_i;
 	wire[`RegBus]			mem_hi_i;
 	wire[`RegBus]			mem_lo_i;
+	wire[`DoubleRegBus]		hilo_temp_i;
+	wire[1:0]				cnt_i;
 
 	//MEM -> MEM/WB
 	wire					mem_wreg_o;
@@ -79,16 +84,29 @@ module openmips(
 	wire[`RegBus]			hi;
 	wire[`RegBus]			lo;
 	
+	//Control 
+	wire[5:0]				stall;
+	wire					stallreq_from_id;
+	wire					stallreq_from_ex;
+
 /**************** 2.Instantiate Module *******************/
 
 	pc_reg pc_reg0(
 		.rst(rst),		.clk(clk),
-		.ce(rom_ce_o),	.pc(pc)
+		//From Control
+		.stall(stall),
+		//To ROM
+		.ce(rom_ce_o),
+		//To ROM and IF/ID
+		.pc(pc)
 	);
 	assign rom_addr_o = pc;
 
 	if_id if_id0(
 		.rst(rst),		.clk(clk),	
+		//From Control
+		.stall(stall),
+		//From PC
 		.if_pc(pc),					.if_inst(rom_data_i),
 		.id_pc(id_pc_i),			.id_inst(id_inst_i)		
 	);
@@ -98,6 +116,8 @@ module openmips(
 		.pc_i(id_pc_i),				.inst_i(id_inst_i),
 		//From Regfiles
 		.reg1_data_i(reg1_data),	.reg2_data_i(reg2_data),
+		//To Control
+		.stallreq(stallreq_from_id),
 		/* Data Forward */
 		.ex_wdata_i(ex_wdata_o),	.ex_wd_i(ex_wd_o),
 		.ex_wreg_i(ex_wreg_o),
@@ -126,6 +146,9 @@ module openmips(
 
 	id_ex id_ex0(
 		.rst(rst),		.clk(clk),		
+		//From Control
+		.stall(stall),
+		//From ID
 		.id_aluop(id_aluop_o),		.id_alusel(id_alusel_o),
 		.id_reg1(id_reg1_o),		.id_reg2(id_reg2_o),
 		.id_wd(id_wd_o),			.id_wreg(id_wreg_o),
@@ -148,16 +171,30 @@ module openmips(
 		//From MEM, HI-LO 
 		.mem_hi_i(mem_hi_i),		.mem_lo_i(mem_lo_i),
 		.mem_whilo_i(mem_whilo_i),
+		//From EX/MEM (Multiple Cycle)
+		.cnt_i(cnt_i),
+		.hilo_temp_i(hilo_temp_i),
+
+		//To Control
+		.stallreq(stallreq_from_ex),
 		//To EX/MEM
 		.wdata_o(ex_wdata_o),		.wd_o(ex_wd_o),
 		.wreg_o(ex_wreg_o),
 		//TO EX/MEM (HI-LO)
 		.hi_o(ex_hi_o),				.lo_o(ex_lo_o),
-		.whilo_o(ex_whilo_o)
+		.whilo_o(ex_whilo_o),
+		//TO EX/MEM (Multiple Cycle)
+		.cnt_o(cnt_o),
+		.hilo_temp_o(hilo_temp_o)
 	);
 
 	ex_mem ex_mem0(
 		.rst(rst),		.clk(clk),		
+		//From EX/MEM (Multiple Cycle)
+		.cnt_i(cnt_o),
+		.hilo_i(hilo_temp_o),
+		//From Control
+		.stall(stall),
 		.ex_wdata(ex_wdata_o),		.ex_wd(ex_wd_o),
 		.ex_wreg(ex_wreg_o),
 		.ex_hi(ex_hi_o),			.ex_lo(ex_lo_o),
@@ -166,7 +203,10 @@ module openmips(
 		.mem_wdata(mem_wdata_i),	.mem_wd(mem_wd_i),
 		.mem_wreg(mem_wreg_i),
 		.mem_hi(mem_hi_i),			.mem_lo(mem_lo_i),
-		.mem_whilo(mem_whilo_i)
+		.mem_whilo(mem_whilo_i),
+		//From EX/MEM (Multiple Cycle)
+		.cnt_o(cnt_i),
+		.hilo_o(hilo_temp_i)
 	);
 	
 	mem mem0(
@@ -186,6 +226,8 @@ module openmips(
 
 	mem_wb mem_wb0(
 		.rst(rst),		.clk(clk),
+		//From Control
+		.stall(stall),
 		//From MEM
 		.mem_wdata(mem_wdata_o),	.mem_wd(mem_wd_o),
 		.mem_wreg(mem_wreg_o),
@@ -208,4 +250,10 @@ module openmips(
 		.hi_o(hi),					.lo_o(lo)
 	);
 
+	ctrl ctrl0(
+		.rst(rst),
+		.stallreq_from_id(stallreq_from_id),
+		.stallreq_from_ex(stallreq_from_ex),
+		.stall(stall)
+	);
 endmodule

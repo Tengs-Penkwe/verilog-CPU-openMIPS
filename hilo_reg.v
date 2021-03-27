@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module hilo_reg(
 	input wire			rst,
 	input wire			clk,

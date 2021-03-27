@@ -1,13 +1,13 @@
+`timescale 1ns/1ps
 `include "defines.v"
 module ex(
 	input wire				rst,
 
+	/* From ID/EX */
 	input wire[`AluOpBus]	aluop_i,
 	input wire[`AluSelBus]	alusel_i,
-
 	input wire[`RegBus]		reg1_i,
 	input wire[`RegBus]		reg2_i,
-
 	input wire[`RegAddrBus]	wd_i,
 	input wire				wreg_i,
 
@@ -25,37 +25,56 @@ module ex(
 	input wire				mem_whilo_i,
 	/********** Operand Forward **********/
 
+	/* Multiple Cycle Instruction */
+	input wire[`DoubleRegBus] hilo_temp_i,
+	input wire[1:0]			cnt_i,
+
+	//To EX/MEM
 	output reg[`RegAddrBus]	wd_o,
 	output reg				wreg_o,
 	output reg[`RegBus]		wdata_o,
-
 	output reg[`RegBus]		hi_o,
 	output reg[`RegBus]		lo_o,
-	output reg				whilo_o
+	output reg				whilo_o,
+
+	/* Multiple Cycle Instruction */
+	output reg[`DoubleRegBus] hilo_temp_o,
+	output reg[1:0]			cnt_o,
+
+	/* To Control */
+	output reg				stallreq
 );
 	
 	/********************* Save The Result of Operation *************/
-	reg[`RegBus]			logicout;
-	reg[`RegBus]			shiftres;
-	reg[`RegBus]			moveres;
-	reg[`RegBus]			HI;
-	reg[`RegBus]			LO;
+		reg[`RegBus]			logicout;
+		reg[`RegBus]			shiftres;
+		reg[`RegBus]			moveres;
+		reg[`RegBus]			HI;
+		reg[`RegBus]			LO;
 
-	wire					ov_sum;				//! Overflow Situation
-	wire					reg1_eq_reg2;
-	wire					reg1_lt_reg2;
-	wire[`RegBus]			reg2_i_mux;			//! One's complete of the second operator
-	wire[`RegBus]			reg1_i_not;
-	wire[`RegBus]			result_sum;			//! Addition Result
-	reg[`RegBus]			arithmeticres;
+		wire					ov_sum;				//! Overflow Situation
+		wire					reg1_eq_reg2;
+		wire					reg1_lt_reg2;
+		wire[`RegBus]			reg2_i_mux;			//! One's complete of the second operator
+		wire[`RegBus]			reg1_i_not;
+		wire[`RegBus]			result_sum;			//! Addition Result
+		reg[`RegBus]			arithmeticres;
 
-	wire[`RegBus]			multiplicand;
-	wire[`RegBus]			multipler;
-	wire[`DoubleRegBus]		hilo_temp;			//! 64 bits temporary rsult of mul
-	reg[`DoubleRegBus]		mulres;
+		wire[`RegBus]			multiplicand;
+		wire[`RegBus]			multipler;
+		wire[`DoubleRegBus]		hilo_temp;			//! 64 bits temporary rsult of mul
+		reg[`DoubleRegBus]		mulres;
 
-	/***************** 1.HI LO Register *************/
-	//1.1 Input 
+		reg[`DoubleRegBus]		hilo_temp_1;		//! 64 bits temporary rsult of Multiple Add
+		reg						stallreq_from_madd_msub;
+
+	/********************* Stall the Pipeline *************/
+	always @(*) begin
+		stallreq <= stallreq_from_madd_msub;
+	end
+
+	/***************** 1. Assign *************/
+	//1.1 Input to HI LO Register
 	always @(*)begin
 		if (rst==`RstEnable) begin
 			{HI,LO} <= {`ZeroWord, `ZeroWord};
@@ -67,30 +86,6 @@ module ex(
 			{HI,LO} <= {hi_i, lo_i};
 		end
 	end
-	//3.2 Output to HI-Lo register
-	always @(*) begin
-		if (rst==`RstEnable) begin
-			whilo_o	<= `WriteDisable;
-			hi_o	<= `ZeroWord;
-			lo_o	<= `ZeroWord;
-		end else if((aluop_i == `EXE_MULT_OP) || (aluop_i == `EXE_MULTU_OP)) begin
-			whilo_o	<= `WriteEnable;
-			hi_o	<= mulres[63:32];
-			lo_o	<= mulres[31:0];
-		end else if(aluop_i == `EXE_MTHI_OP)begin
-			whilo_o	<= `WriteEnable;
-			hi_o	<= reg1_i;
-			lo_o	<= LO;
-		end else if(aluop_i == `EXE_MTLO_OP)begin
-			whilo_o	<= `WriteEnable;
-			hi_o	<= HI;
-			lo_o	<= reg1_i;
-		end else begin
-			whilo_o	<= `WriteDisable;
-			hi_o	<= `ZeroWord;
-			lo_o	<= `ZeroWord;
-		end
-	end
 
 	/***************** 2.Do ALU Operation due to aluop_i *************/
 	//2.1 Logical Operation
@@ -99,21 +94,11 @@ module ex(
 			logicout		<= `ZeroWord; 
 		end else begin
 			case (aluop_i) 
-				`EXE_OR_OP: begin
-					logicout<= reg1_i | reg2_i;
-				end
-				`EXE_AND_OP: begin
-					logicout<= reg1_i & reg2_i;
-				end
-				`EXE_NOR_OP: begin
-					logicout<= ~(reg1_i|reg2_i);
-				end
-				`EXE_XOR_OP: begin
-					logicout<= reg1_i ^ reg2_i;
-				end
-				default: begin
-					logicout<= `ZeroWord;
-				end
+				`EXE_OR_OP: logicout<= reg1_i | reg2_i;
+				`EXE_AND_OP: logicout<= reg1_i & reg2_i;
+				`EXE_NOR_OP: logicout<= ~(reg1_i|reg2_i);
+				`EXE_XOR_OP: logicout<= reg1_i ^ reg2_i;
+				default: logicout<= `ZeroWord;
 			endcase
 		end
 	end
@@ -124,18 +109,10 @@ module ex(
 			shiftres		<= `ZeroWord; 
 		end else begin
 			case (aluop_i) 
-				`EXE_SLL_OP: begin
-					shiftres<= reg2_i << reg1_i[4:0];
-				end
-				`EXE_SRL_OP: begin
-					shiftres<= reg2_i >> reg1_i[4:0];
-				end
-				`EXE_SRA_OP: begin
-					shiftres<= ({32{reg2_i[31]}} << (6'd32-{1'b0,reg1_i[4:0]})) | (reg2_i>>reg1_i[4:0]);
-				end
-				default: begin
-					shiftres<= `ZeroWord;
-				end
+				`EXE_SLL_OP: shiftres<= reg2_i << reg1_i[4:0];
+				`EXE_SRL_OP: shiftres<= reg2_i >> reg1_i[4:0];
+				`EXE_SRA_OP: shiftres<= ({32{reg2_i[31]}} << (6'd32-{1'b0,reg1_i[4:0]})) | (reg2_i>>reg1_i[4:0]);
+				default: shiftres<= `ZeroWord;
 			endcase
 		end
 	end
@@ -197,29 +174,19 @@ module ex(
 					arithmeticres	<= result_sum;
 				end
 				`EXE_CLZ_OP: begin
-					arithmeticres 	<=	 reg1_i[31] ? 0 : reg1_i[30] ? 1 : reg1_i[29] ? 2 :
-										 reg1_i[28] ? 3 : reg1_i[27] ? 4 : reg1_i[26] ? 5 :
-										 reg1_i[25] ? 6 : reg1_i[24] ? 7 : reg1_i[23] ? 8 :
-										 reg1_i[22] ? 9 : reg1_i[21] ? 10: reg1_i[20] ? 11:
-										 reg1_i[19] ? 12: reg1_i[18] ? 13: reg1_i[17] ? 14:
-										 reg1_i[16] ? 15: reg1_i[15] ? 16: reg1_i[14] ? 17:
-										 reg1_i[13] ? 18: reg1_i[12] ? 19: reg1_i[11] ? 20:
-										 reg1_i[10] ? 21: reg1_i[9] ? 22 : reg1_i[8] ? 23 :
-										 reg1_i[7] ? 24 : reg1_i[6] ? 25 : reg1_i[5] ? 26 :
-										 reg1_i[4] ? 27 : reg1_i[3] ? 28 : reg1_i[2] ? 29 :
+					arithmeticres 	<=	 reg1_i[31] ? 0 : reg1_i[30] ? 1 : reg1_i[29] ? 2 : reg1_i[28] ? 3 : reg1_i[27] ? 4 : reg1_i[26] ? 5 :
+										 reg1_i[25] ? 6 : reg1_i[24] ? 7 : reg1_i[23] ? 8 : reg1_i[22] ? 9 : reg1_i[21] ? 10: reg1_i[20] ? 11:
+										 reg1_i[19] ? 12: reg1_i[18] ? 13: reg1_i[17] ? 14: reg1_i[16] ? 15: reg1_i[15] ? 16: reg1_i[14] ? 17:
+										 reg1_i[13] ? 18: reg1_i[12] ? 19: reg1_i[11] ? 20: reg1_i[10] ? 21: reg1_i[9] ? 22 : reg1_i[8] ? 23 :
+										 reg1_i[7] ? 24 : reg1_i[6] ? 25 : reg1_i[5] ? 26 : reg1_i[4] ? 27 : reg1_i[3] ? 28 : reg1_i[2] ? 29 :
 										 reg1_i[1] ? 30 : reg1_i[0] ? 31 : 32 ;
 				end
 				`EXE_CLO_OP: begin
-					arithmeticres	<= 	(reg1_i_not[31] ? 0 : reg1_i_not[30] ? 1 : reg1_i_not[29] ? 2 :
-										 reg1_i_not[28] ? 3 : reg1_i_not[27] ? 4 : reg1_i_not[26] ? 5 :
-										 reg1_i_not[25] ? 6 : reg1_i_not[24] ? 7 : reg1_i_not[23] ? 8 :
-										 reg1_i_not[22] ? 9 : reg1_i_not[21] ? 10: reg1_i_not[20] ? 11:
-										 reg1_i_not[19] ? 12: reg1_i_not[18] ? 13: reg1_i_not[17] ? 14:
-										 reg1_i_not[16] ? 15: reg1_i_not[15] ? 16: reg1_i_not[14] ? 17:
-										 reg1_i_not[13] ? 18: reg1_i_not[12] ? 19: reg1_i_not[11] ? 20:
-										 reg1_i_not[10] ? 21: reg1_i_not[9] ? 22 : reg1_i_not[8] ? 23 :
-										 reg1_i_not[7] ? 24 : reg1_i_not[6] ? 25 : reg1_i_not[5] ? 26 :
-										 reg1_i_not[4] ? 27 : reg1_i_not[3] ? 28 : reg1_i_not[2] ? 29 :
+					arithmeticres	<= 	(reg1_i_not[31] ? 0 : reg1_i_not[30] ? 1 : reg1_i_not[29] ? 2 : reg1_i_not[28] ? 3 : reg1_i_not[27] ? 4 : reg1_i_not[26] ? 5 :
+										 reg1_i_not[25] ? 6 : reg1_i_not[24] ? 7 : reg1_i_not[23] ? 8 : reg1_i_not[22] ? 9 : reg1_i_not[21] ? 10: reg1_i_not[20] ? 11:
+										 reg1_i_not[19] ? 12: reg1_i_not[18] ? 13: reg1_i_not[17] ? 14: reg1_i_not[16] ? 15: reg1_i_not[15] ? 16: reg1_i_not[14] ? 17:
+										 reg1_i_not[13] ? 18: reg1_i_not[12] ? 19: reg1_i_not[11] ? 20: reg1_i_not[10] ? 21: reg1_i_not[9] ? 22 : reg1_i_not[8] ? 23 :
+										 reg1_i_not[7] ? 24 : reg1_i_not[6] ? 25 : reg1_i_not[5] ? 26 : reg1_i_not[4] ? 27 : reg1_i_not[3] ? 28 : reg1_i_not[2] ? 29 :
 										 reg1_i_not[1] ? 30 : reg1_i_not[0] ? 31 : 32) ;
 				end
 			endcase
@@ -227,16 +194,19 @@ module ex(
 	end				//always
 
 	//2.5 Multiplication 
-		assign multiplicand = (((aluop_i==`EXE_MUL_OP)||(aluop_i==`EXE_MULT_OP)) && (reg1_i[31])) ?
+		assign multiplicand = (((aluop_i==`EXE_MUL_OP)||(aluop_i==`EXE_MULT_OP)||(aluop_i==`EXE_MADD_OP)||(aluop_i==`EXE_MSUB_OP))
+								&& (reg1_i[31])) ?
 								(~reg1_i + 1) : reg1_i;
-		assign multipler	= (((aluop_i==`EXE_MUL_OP)||(aluop_i==`EXE_MULT_OP)) && (reg2_i[31])) ?
+		assign multipler	= (((aluop_i==`EXE_MUL_OP)||(aluop_i==`EXE_MULT_OP)||(aluop_i==`EXE_MADD_OP)||(aluop_i==`EXE_MSUB_OP))
+								&& (reg2_i[31])) ?
 								(~reg2_i + 1) : reg2_i;
 		assign hilo_temp	= multiplicand * multipler;
 		//! Modify the Result
 	always @(*) begin
 		if (rst==`RstEnable) begin
 			mulres		<= {`ZeroWord, `ZeroWord};
-		end else if ((aluop_i == `EXE_MUL_OP)||(aluop_i == `EXE_MULT_OP)) begin
+		end else if ((aluop_i == `EXE_MUL_OP)||(aluop_i == `EXE_MULT_OP)||
+					(aluop_i==`EXE_MADD_OP)||(aluop_i==`EXE_MSUB_OP)) begin
 			if (reg1_i[31] ^ reg2_i[31] == 1'b1) begin
 				mulres	<= ~hilo_temp + 1;
 			end else begin
@@ -247,8 +217,38 @@ module ex(
 		end
 	end		//always
 
+		`define SET_MARITH(i_hilo_temp_o, i_cnt_o, o_hilo_temp_i, o_stallreq_from_madd_msub) if(1) begin \
+			hilo_temp_o				<= i_hilo_temp_o 			; \
+			cnt_o    				<= i_cnt_o					; \
+			hilo_temp_1    			<= o_hilo_temp_i    		; \
+			stallreq_from_madd_msub	<= o_stallreq_from_madd_msub; \
+		end else if(0)
+	//2.6 Multiply-Add
+	always @(*) begin
+		if (rst==`RstEnable) begin
+			`SET_MARITH ({`ZeroWord, `ZeroWord},2'b00, hilo_temp_i + {HI,LO},	`NoStop);
+		end	else begin 
+			case (aluop_i)  
+				`EXE_MADD_OP, `EXE_MADDU_OP: begin
+					if (cnt_i == 2'b00)  
+						`SET_MARITH (mulres,				2'b01, {`ZeroWord, `ZeroWord},	`Stop);
+					if (cnt_i == 2'b01) 
+						`SET_MARITH ({`ZeroWord, `ZeroWord},2'b10, hilo_temp_i + {HI,LO},	`NoStop);
+				end
+				`EXE_MSUB_OP, `EXE_MSUBU_OP: begin
+					if (cnt_i == 2'b00)  
+						`SET_MARITH (~mulres + 1,			2'b01, {`ZeroWord, `ZeroWord},	`Stop);
+					if (cnt_i == 2'b01) 
+						`SET_MARITH ({`ZeroWord, `ZeroWord},2'b10, hilo_temp_i + {HI,LO},	`NoStop);
+				end
+				default:`SET_MARITH ({`ZeroWord, `ZeroWord},2'b00, hilo_temp_i + {HI,LO},	`NoStop);
+			endcase
+		end			//if
+	end				//always
+
 	/***************** 3.Select Result due to alusel_i *************
 	***************************************************************/
+	//3.1 Output to General Register
 	always @(*) begin
 		wd_o			<= wd_i;
 		if (((aluop_i==`EXE_ADD_OP)||(aluop_i==`EXE_ADDI_OP)||(aluop_i==`EXE_SUB_OP)) && (ov_sum==1'b1)) begin
@@ -257,25 +257,38 @@ module ex(
 			wreg_o		<= wreg_i;
 		end
 		case (alusel_i)
-			`EXE_RES_LOGIC: begin
-				wdata_o	<= logicout;
-			end
-			`EXE_RES_SHIFT: begin
-				wdata_o <= shiftres;
-			end
-			`EXE_RES_MOVE: begin
-				wdata_o	<= moveres;
-			end
-			`EXE_RES_ARITH: begin
-				wdata_o <= arithmeticres;
-			end
-			`EXE_RES_MUL: begin
-				wdata_o <= mulres[31:0];
-			end
-			default:		begin
-				wdata_o	<= `ZeroWord;
-			end
+			`EXE_RES_LOGIC:		wdata_o	<= logicout;
+			`EXE_RES_SHIFT:		wdata_o <= shiftres;
+			`EXE_RES_MOVE:		wdata_o	<= moveres;
+			`EXE_RES_ARITH:		wdata_o <= arithmeticres;
+			`EXE_RES_MUL:		wdata_o <= mulres[31:0];
+			default:			wdata_o	<= `ZeroWord;
 		endcase
 	end
+		// Operations goning to write HI & LO (include moves & division & multipilcation)
+		`define SET_HILO_OUT(i_whilo, i_hi, i_lo) if(1) begin \
+			whilo_o <= i_whilo ; \
+			hi_o    <= i_hi    ; \
+			lo_o    <= i_lo    ; \
+		end else if(0)
+	//3.2 Output to HI-Lo register
+	always @(*) begin
+		if (rst==`RstEnable) begin
+			`SET_HILO_OUT(`WriteDisable, `ZeroWord, `ZeroWord);
+		end
+		case (aluop_i)
+			`EXE_MADDU_OP, `EXE_MADD_OP, `EXE_SUBU_OP, `EXE_SUB_OP:
+				`SET_HILO_OUT(1'b1,	hilo_temp_1[63:32],	hilo_temp_1[31:0]);
+			`EXE_MULT_OP, `EXE_MULTU_OP: 
+				`SET_HILO_OUT(1'b1,	mulres[63:32],mulres[31:0]);
+			`EXE_MTHI_OP:
+				`SET_HILO_OUT(1'b1,	reg1_i,	LO);
+			`EXE_MTLO_OP:
+				`SET_HILO_OUT(1'b1,	HI,		reg1_i);
+		endcase
+	end
+
+    `undef SET_MARITH
+    `undef SET_HILO_OUT
 
 endmodule
