@@ -69,6 +69,9 @@
 `define EXE_SLT			6'b101010
 `define EXE_SLTU		6'b101011
 
+`define EXE_DIV			6'b011010
+`define EXE_DIVU		6'b011011
+
 `define EXE_MULT		6'b011000
 `define EXE_MULTU		6'b011001
 //Special 2 000000=> 6'b011100
@@ -129,6 +132,8 @@
 `define EXE_MSUB_OP		8'b10101010
 `define EXE_MSUBU_OP	8'b10101011
 
+`define EXE_DIV_OP		8'b00011010
+`define EXE_DIVU_OP		8'b00011011
 //********** AluSel **********//
 `define EXE_RES_NOP		3'b000
 `define EXE_RES_LOGIC	3'b001
@@ -145,11 +150,22 @@
 `define ByteWidth		8
 
 //*************** Macro about General Register Regfile ************
-`define RegAddrBus 4:0				//Regfile Address Bus Width
-`define RegBus 31:0					//Regfile Data Bus width
-`define RegWidth 32					//Width of G-Reg
-`define DoubleRegWidth 64			
-`define DoubleRegBus 63:0
-`define RegNum 32					//Number of G-Regs 2^5=32
-`define RegNumLog2 5				
-`define NOPRegAddr 5'b00000			//Reg r0 === 0, for special utility
+`define RegAddrBus		4:0			//Regfile Address Bus Width
+`define RegBus			31:0		//Regfile Data Bus width
+`define RegWidth		32			//Width of G-Reg
+`define DoubleRegWidth	64			
+`define DoubleRegBus 	63:0
+`define RegNum			32			//Number of G-Regs 2^5=32
+`define RegNumLog2		5				
+`define NOPRegAddr		5'b00000	//Reg r0 === 0, for special utility
+
+
+//*************** Divide ************
+`define DivFree			2'b00
+`define DivByZero		2'b01
+`define DivOn			2'b10
+`define DivEnd			2'b11
+`define DivResultReady	1'b1
+`define DivResultNotReady	1'b0
+`define DivStart		1'b1
+`define DivStop			1'b0
