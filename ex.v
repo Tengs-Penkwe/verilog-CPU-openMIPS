@@ -11,6 +11,10 @@ module ex(
 	input wire[`RegAddrBus]	wd_i,
 	input wire				wreg_i,
 
+	// From DIV
+	input wire[`DoubleRegBus]div_result_i,
+	input wire				div_ready_i,
+
 	//! From HI-LO Module
 	input wire[`RegBus]		hi_i,
 	input wire[`RegBus]		lo_i,
@@ -36,6 +40,12 @@ module ex(
 	output reg[`RegBus]		hi_o,
 	output reg[`RegBus]		lo_o,
 	output reg				whilo_o,
+
+	//To DIV
+	output reg[`RegBus]		div_opdata1_o,
+	output reg[`RegBus]		div_opdata2_o,
+	output reg				div_start_o,
+	output reg				signed_div_o,
 
 	/* Multiple Cycle Instruction */
 	output reg[`DoubleRegBus] hilo_temp_o,
@@ -68,9 +78,11 @@ module ex(
 		reg[`DoubleRegBus]		hilo_temp_1;		//! 64 bits temporary rsult of Multiple Add
 		reg						stallreq_from_madd_msub;
 
+		reg						stallreq_from_div;
+
 	/********************* Stall the Pipeline *************/
 	always @(*) begin
-		stallreq <= stallreq_from_madd_msub;
+		stallreq <= stallreq_from_madd_msub || stallreq_from_div;
 	end
 
 	/***************** 1. Assign *************/
@@ -246,6 +258,40 @@ module ex(
 		end			//if
 	end				//always
 
+		`define SET_DIV(i_stallreq_from_div, i_div_opdata1_o, i_div_opdata2_o, i_div_start_o, i_signed_div_o) if(1) begin \
+			stallreq_from_div		<= i_stallreq_from_div		;\
+			div_opdata1_o			<= i_div_opdata1_o			;\
+			div_opdata2_o			<= i_div_opdata2_o			;\
+			div_start_o				<= i_div_start_o			;\
+			signed_div_o			<= i_signed_div_o			;\
+		end else if(0)
+	//2.7 Divide
+	always @(*) begin
+		if(rst == `RstEnable) begin
+			`SET_DIV(`NoStop,	32'h0,	32'h0,	`DivStop,	1'b0);
+		end else begin
+			`SET_DIV(`NoStop,	32'h0,	32'h0,	`DivStop,	1'b0);
+			case(aluop_i)
+				`EXE_DIV_OP: begin
+					if(div_ready_i == `DivResultNotReady) 
+						`SET_DIV(`Stop,  reg1_i, reg2_i, `DivStart, 1'b1);
+					else if(div_ready_i == `DivResultReady)
+						`SET_DIV(`NoStop,reg1_i, reg2_i, `DivStop,  1'b1);
+					else 
+						`SET_DIV(`NoStop,32'h0,  32'h0,  `DivStop,  1'b0);
+				end
+				`EXE_DIVU_OP: begin
+					if(div_ready_i == `DivResultNotReady)
+						`SET_DIV(`Stop,  reg1_i, reg2_i, `DivStart, 1'b0);
+					else if(div_ready_i == `DivResultReady)
+						`SET_DIV(`NoStop,reg1_i, reg2_i, `DivStop,  1'b0);
+					else 
+						`SET_DIV(`NoStop,32'h0,  32'h0,  `DivStop,  1'b0);
+				end
+			endcase
+		end			//if
+	end				//always
+
 	/***************** 3.Select Result due to alusel_i *************
 	***************************************************************/
 	//3.1 Output to General Register
@@ -277,18 +323,21 @@ module ex(
 			`SET_HILO_OUT(`WriteDisable, `ZeroWord, `ZeroWord);
 		end
 		case (aluop_i)
-			`EXE_MADDU_OP, `EXE_MADD_OP, `EXE_SUBU_OP, `EXE_SUB_OP:
+			`EXE_MADDU_OP, `EXE_MADD_OP, `EXE_MSUBU_OP, `EXE_MSUB_OP:
 				`SET_HILO_OUT(1'b1,	hilo_temp_1[63:32],	hilo_temp_1[31:0]);
 			`EXE_MULT_OP, `EXE_MULTU_OP: 
-				`SET_HILO_OUT(1'b1,	mulres[63:32],mulres[31:0]);
+				`SET_HILO_OUT(1'b1,	mulres[63:32],		mulres[31:0]);
 			`EXE_MTHI_OP:
-				`SET_HILO_OUT(1'b1,	reg1_i,	LO);
+				`SET_HILO_OUT(1'b1,	reg1_i,				LO);
 			`EXE_MTLO_OP:
-				`SET_HILO_OUT(1'b1,	HI,		reg1_i);
+				`SET_HILO_OUT(1'b1,	HI,			   		reg1_i);
+			`EXE_DIV_OP, `EXE_DIVU_OP:
+				`SET_HILO_OUT(1'b1, div_result_i[63:32],div_result_i[31:0]);
 		endcase
 	end
 
     `undef SET_MARITH
     `undef SET_HILO_OUT
+    `undef SET_DIV
 
 endmodule

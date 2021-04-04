@@ -24,7 +24,7 @@ module openmips_min_sopc_tb();
 		$dumpvars(0,openmips_min_sopc0);
 				rst = `RstEnable;
 		#25 	rst = `RstDisable;
-		#1000 	$finish;
+		#5000 	$finish;
 	end
 
 endmodule
