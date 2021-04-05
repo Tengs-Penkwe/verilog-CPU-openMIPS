@@ -44,17 +44,17 @@ module div(
 						end else begin 
 							state	<= `DivOn;
 							cnt		<= 6'b000000;
-							temp_op1<= (signed_div_i==1'b1 && opdata1_i[31]==1'b1) ? (~opdata1_i+1):(opdata1_i);
-							temp_op2<= (signed_div_i==1'b1 && opdata2_i[31]==1'b1) ? (~opdata2_i+1):(opdata2_i);
+							temp_op1 = (signed_div_i==1'b1 && opdata1_i[31]==1'b1) ? (~opdata1_i+1):(opdata1_i);
+							temp_op2 = (signed_div_i==1'b1 && opdata2_i[31]==1'b1) ? (~opdata2_i+1):(opdata2_i);
+							dividend	<= {32'h0, 32'h0};
+							dividend[32:1]<= temp_op1;
+							divisor		<= temp_op2;
 						end
-						dividend	<= {32'h0, 32'h0};
-						dividend[32:1]<= temp_op1;
-						divisor		<= temp_op2;
 					end else begin //if(opdata2_i == 32'h0) 
 						ready_o		<= `DivResultNotReady;
 						result_o	<= {32'h0, 32'h0};
-					end			
-				end		//DivFree
+					end		//if	
+				end			//DivFree
 				//******************** DivByZero *****************
 				//Enter DivEnd state, set results as 0
 				//*************************************************
@@ -80,11 +80,13 @@ module div(
 								dividend[31:0] <= (~dividend[31:0]+1);
 							if ((signed_div_i==1'b1) && (opdata1_i[31]^dividend[64]==1'b1))
 								dividend[64:33] <= (~dividend[64:33]+1);
+							state	<= `DivEnd;
+							cnt		<= 6'b000000;
 						end
 					end else begin 		//annul_i == 1
 						state		<= `DivFree;
 					end
-				end
+				end			//DivOn
 				//******************** DivEnd *********************
 				//Operation Ended,
 				//1) result_o[63:32] <= Reminder
