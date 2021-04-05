@@ -181,7 +181,7 @@ module openmips(
 		.mem_hi_i(mem_hi_i),		.mem_lo_i(mem_lo_i),
 		.mem_whilo_i(mem_whilo_i),
 		//From DIV
-		.div_result_i(div_result), .div_ready_i(div_ready),
+		.div_result_i(div_result), 	.div_ready_i(div_ready),
 		//From EX/MEM (Multiple Cycle)
 		.cnt_i(cnt_i),
 		.hilo_temp_i(hilo_temp_i),

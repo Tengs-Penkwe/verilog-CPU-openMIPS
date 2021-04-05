@@ -135,11 +135,11 @@ module id(
 						`EXE_SUBU:	`SET_INST(`EXE_SUBU_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
 						`EXE_SLT:	`SET_INST(`EXE_SLT_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
 						`EXE_SLTU:	`SET_INST(`EXE_SLTU_OP,	`EXE_RES_ARITH,1,rs,1,rt,1,rd,0	,0);	
-						`EXE_MULT:	`SET_INST(`EXE_MULT_OP,	`EXE_RES_NOP  ,1,rs,1,rt,0,rd,0	,0);	
-						`EXE_MULTU:	`SET_INST(`EXE_MULTU_OP,`EXE_RES_NOP  ,1,rs,1,rt,0,rd,0	,0);	
+						`EXE_MULT:	`SET_INST(`EXE_MULT_OP,	`EXE_RES_NOP,  1,rs,1,rt,0,rd,0	,0);	
+						`EXE_MULTU:	`SET_INST(`EXE_MULTU_OP,`EXE_RES_NOP,  1,rs,1,rt,0,rd,0	,0);	
 
-						`EXE_DIV:	`SET_INST(`EXE_DIV_OP,	`EXE_RES_NOP,   1,rs,1,rt,0,rd,0 ,0);
-						`EXE_DIVU:	`SET_INST(`EXE_DIVU_OP,	`EXE_RES_NOP,   1,rs,1,rt,0,rd,0 ,0);
+						`EXE_DIV:	`SET_INST(`EXE_DIV_OP,	`EXE_RES_NOP,  1,rs,1,rt,0,rd,0 ,0);
+						`EXE_DIVU:	`SET_INST(`EXE_DIVU_OP,	`EXE_RES_NOP,  1,rs,1,rt,0,rd,0 ,0);
 					endcase		//case(funct)
 				end				//`EXE_SPEC_INST
 				`EXE_SPEC2_INST: begin	//op(31~26):5'b011100 indicates special-2 instruction

@@ -21,6 +21,7 @@ module openmips_min_sopc_tb();
 
 	initial begin
 		$readmemh ("inst_rom.data",openmips_min_sopc0.openmips0.inst_rom0.inst_mem);
+		$dumpfile("dump.vcd");
 		$dumpvars(0,openmips_min_sopc0);
 				rst = `RstEnable;
 		#25 	rst = `RstDisable;
