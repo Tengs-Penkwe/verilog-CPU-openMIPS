@@ -3,6 +3,9 @@
 module pc_reg(
 	input wire					clk,	
 	input wire					rst,
+	//From ID
+	input wire					branch_flag_i,
+	input wire[`RegBus]			branch_target_address_i,
 	// From Control Module
 	input wire[5:0]				stall,
 
@@ -21,9 +24,12 @@ module pc_reg(
 
 	always @(posedge clk) begin
 		if(ce == `ChipDisable) begin
-			pc <= 32'h00000000;
+			pc 		<= 32'h00000000;
 		end else if (stall[0] == `NoStop)begin
-			pc <= pc + 4'h4;
+			if(branch_flag_i == `Branch)
+				pc	<= branch_target_address_i;
+			else
+				pc <= pc + 4'h4;
 		end
 	end
 	

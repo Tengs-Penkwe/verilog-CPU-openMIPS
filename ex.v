@@ -10,6 +10,9 @@ module ex(
 	input wire[`RegBus]		reg2_i,
 	input wire[`RegAddrBus]	wd_i,
 	input wire				wreg_i,
+	// DelaySlot
+	input wire[`RegBus]		link_address_i,
+	input wire				is_in_delayslot_i,
 
 	// From DIV
 	input wire[`DoubleRegBus]div_result_i,
@@ -308,6 +311,7 @@ module ex(
 			`EXE_RES_MOVE:		wdata_o	<= moveres;
 			`EXE_RES_ARITH:		wdata_o <= arithmeticres;
 			`EXE_RES_MUL:		wdata_o <= mulres[31:0];
+			`EXE_RES_TRAN:		wdata_o	<= link_address_i;
 			default:			wdata_o	<= `ZeroWord;
 		endcase
 	end

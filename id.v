@@ -20,6 +20,9 @@ module id(
 	input wire[`RegAddrBus]		mem_wd_i,
 	/********** Data Forward **********/ 
 
+	//From ID/EX
+	input wire					is_in_delayslot_i,
+
 	//Send Information to Regfile
 	output reg[`RegAddrBus]		reg1_addr_o,
 	output reg[`RegAddrBus]		reg2_addr_o,
@@ -37,6 +40,17 @@ module id(
 	//Which Reg to write
 	output reg[`RegAddrBus]		wd_o,
 	output reg					wreg_o,
+
+	/********** DelaySlot **********/ 
+	//To ID
+	output reg					branch_flag_o,
+	output reg[`RegBus]			branch_target_address_o,
+	//To ID/EX
+	output reg[`RegBus]			link_addr_o,
+	output reg					is_in_delayslot_o,
+		//Loop Back
+	output reg					next_inst_in_delay_slot_o,
+	/********** DelaySlot **********/ 
 
 	/* To Control Module */
 	output wire					stallreq
@@ -71,39 +85,45 @@ module id(
 	/* Stall Request */
 	assign stallreq = `NoStop;
 
+	/* DelaySlot */
+	wire [`RegBus] pc_8		= pc_i + 8; 
+	wire [`RegBus] pc_4		= pc_i + 4; 
+	wire [`RegBus] pc_jump	= {pc_4[31:28], inst_i[25:0], 2'b00};
+	wire [`RegBus] pc_branch= {pc_4 + {14{inst_i[15:0]}}, inst_i[15:0], 2'b00};
+
 	/********************* 1.Instruction Decipher ********************
 	* In this Stage, OP1(31~26) is read, then we send instruction 
 	* to other stage
 	***************************************************************/
 	
-	//*************** Function-like Macro for OP decode ************
-	`define SET_INST(i_aluop, i_alusel, i_read1, i_reg1_addr, i_read2, i_reg2_addr, i_wreg, i_wd, i_imm, i_inst_valid) if(1) begin \
-		aluop_o       <=  i_aluop       ; \
-		alusel_o      <=  i_alusel      ; \
-		reg1_read_o   <=  i_read1       ; \
-		reg1_addr_o   <=  i_reg1_addr   ; \
-		reg2_read_o   <=  i_read2       ; \
-		reg2_addr_o   <=  i_reg2_addr   ; \
-		wreg_o        <=  i_wreg        ; \
-		wd_o	      <=  i_wd          ; \
-		imm           <=  i_imm         ; \
-		inst_valid    <=  i_inst_valid  ; \
-	end else if(0)
-	
-	`define SET_BRANCH(i_branch_flag, i_branch_target_addr, i_link_addr, i_next_in_delay_slot) if(1) begin \
-		branch_flag_o         <=  i_branch_flag         ; \
-		branch_addr_o         <=  i_branch_target_addr  ; \
-		link_addr_o           <=  i_link_addr           ; \
-		next_in_delay_slot_o  <=  i_next_in_delay_slot  ; \
-	end else if(0)
-
-	/* InstValid Decipher */
+		`define SET_INST(i_aluop, i_alusel, i_read1, i_reg1_addr, i_read2, i_reg2_addr, i_wreg, i_wd, i_imm, i_inst_valid) if(1) begin \
+			aluop_o       <=  i_aluop       ; \
+			alusel_o      <=  i_alusel      ; \
+			reg1_read_o   <=  i_read1       ; \
+			reg1_addr_o   <=  i_reg1_addr   ; \
+			reg2_read_o   <=  i_read2       ; \
+			reg2_addr_o   <=  i_reg2_addr   ; \
+			wreg_o        <=  i_wreg        ; \
+			wd_o	      <=  i_wd          ; \
+			imm           <=  i_imm         ; \
+			inst_valid    <=  i_inst_valid  ; \
+		end else if(0)
+		/* Transfer Instruction */
+		`define SET_BRANCH(i_branch_flag, i_branch_target_addr, i_link_addr, i_next_in_delay_slot) if(1) begin \
+			branch_flag_o         		<=  i_branch_flag         ; \
+			branch_target_address_o		<=  i_branch_target_addr  ; \
+			link_addr_o           		<=  i_link_addr           ; \
+			next_inst_in_delay_slot_o	<=  i_next_in_delay_slot  ; \
+		end else if(0)
+	/* Instruction Decipher */
 	always @(*) begin 
 		if(rst==`RstEnable) begin 
 			`SET_INST(`EXE_NOP_OP,`EXE_RES_NOP,`ReadDisable,`NOPRegAddr,`ReadDisable,`NOPRegAddr,`WriteDisable,`NOPRegAddr,`ZeroWord,`InstValid);
 			//Mind this ! valide (1'b0) and it's nop
+			`SET_BRANCH(`NotBranch, `ZeroWord, `ZeroWord, `NotIndelaySlot);
 		end else begin
 			`SET_INST(`EXE_NOP_OP,`EXE_RES_NOP,0,rs,0,rt,0,rd,`ZeroWord,1);
+			`SET_BRANCH(`NotBranch, `ZeroWord, `ZeroWord, `NotIndelaySlot);
 			case(op) 					//op(31~26)
 				`EXE_SPEC_INST:	begin	//op(31~26):5'0 indicates special instruction
 					case(funct)
@@ -140,9 +160,18 @@ module id(
 
 						`EXE_DIV:	`SET_INST(`EXE_DIV_OP,	`EXE_RES_NOP,  1,rs,1,rt,0,rd,0 ,0);
 						`EXE_DIVU:	`SET_INST(`EXE_DIVU_OP,	`EXE_RES_NOP,  1,rs,1,rt,0,rd,0 ,0);
+
+						`EXE_JR: begin
+									`SET_INST(`EXE_JR_OP,	`EXE_RES_TRAN, 1,rs,0,rt,0,rd,0, 0);
+									`SET_BRANCH(1'b1, reg1_o, 32'h0, 1'b1);
+						end
+						`EXE_JALR: begin
+									`SET_INST(`EXE_JALR_OP,	`EXE_RES_TRAN, 1,rs,0,rt,1,rd,0, 0);
+									`SET_BRANCH(1'b1, reg1_o, pc_8,  1'b1);
+						end
 					endcase		//case(funct)
 				end				//`EXE_SPEC_INST
-				`EXE_SPEC2_INST: begin	//op(31~26):5'b011100 indicates special-2 instruction
+				`EXE_SPEC2_INST: begin	//op(31~26):6'b011100 indicates special-2 instruction
 					case(funct)
 						`EXE_MUL:	`SET_INST(`EXE_MUL_OP,	`EXE_RES_MUL,  1,rs,1,rt,1,rd,0 ,0);
 
@@ -165,6 +194,51 @@ module id(
 				`EXE_ADDIU:	`SET_INST(`EXE_ADDIU_OP,`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
 				`EXE_SLTI:	`SET_INST(`EXE_SLT_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
 				`EXE_SLTIU:	`SET_INST(`EXE_SLTU_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
+
+				`EXE_J: begin
+							`SET_INST(`EXE_J_OP,	`EXE_RES_TRAN, 0,rs,0,rt,0,rd	,0	,0);
+							`SET_BRANCH(1'b1, pc_jump, 32'h0,	 1'b1);
+				end
+				`EXE_JAL: begin
+							`SET_INST(`EXE_JAL_OP,	`EXE_RES_TRAN, 0,rs,0,rt,1,5'd31,0  ,0);
+							`SET_BRANCH(1'b1, pc_jump, pc_8,	 1'b1);
+				end
+				`EXE_BEQ: begin
+							`SET_INST(`EXE_BEQ_OP,	`EXE_RES_TRAN, 1,rs,1,rt,0,rd	,0	,0);
+					if(reg1_o == reg2_o) 	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
+				end
+				`EXE_BGTZ: begin
+							`SET_INST(`EXE_BGTZ_OP,	`EXE_RES_TRAN, 1,rs,0,rt,0,rd	,0  ,0);
+					if(reg1_o[31]==1'b0 && (reg1_o!=32'h0))	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
+				end
+				`EXE_BLEZ: begin
+							`SET_INST(`EXE_BLEZ_OP,	`EXE_RES_TRAN, 1,rs,0,rt,0,rd	,0   ,0);
+					if(reg1_o[31]==1'b1 || (reg1_o==32'h0))	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
+				end
+				`EXE_BNE: begin
+							`SET_INST(`EXE_BNE_OP,	`EXE_RES_TRAN, 1,rs,1,rt,0,rd	,0   ,0);
+					if(reg1_o == reg2_o)	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
+				end
+				`EXE_REGIMM_INST: begin	//op(31~26):6'b000001 indicates 
+					case(rt)
+						`EXE_BGEZ: begin
+							`SET_INST(`EXE_BGEZ_OP,	`EXE_RES_TRAN, 1,rs,0,rt,0,rd	,0   ,0);
+							if(reg1_o[31]==1'b0)	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
+						end
+						`EXE_BGEZAL: begin
+							`SET_INST(`EXE_BGEZAL_OP,`EXE_RES_TRAN,1,rs,0,rt,1,5'd31,0   ,0);
+							if(reg1_o[31]==1'b0)	`SET_BRANCH(1'b1, pc_branch, pc_8,	1'b1);
+						end
+						`EXE_BLTZ: begin
+							`SET_INST(`EXE_BLTZ_OP,	`EXE_RES_TRAN, 1,rs,0,rt,0,rd	,0   ,0);
+							if(reg1_o[31]==1'b1)	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
+						end
+						`EXE_BLTZAL: begin
+							`SET_INST(`EXE_BLTZAL_OP,`EXE_RES_TRAN,1,rs,0,rt,1,5'd31,0   ,0);
+							if(reg1_o[31]==1'b1)	`SET_BRANCH(1'b1, pc_branch, pc_8,	1'b1);
+						end
+					endcase
+				end
 			endcase	//case(op)
 		end			//if
 	end				//always
@@ -199,6 +273,15 @@ module id(
 			reg2_o 		<= imm;
 		end else begin
 			reg2_o		<= `ZeroWord;
+		end
+	end
+
+	//! DelaySlot 
+	always @(*) begin
+		if(rst == `RstEnable) begin
+			is_in_delayslot_o	<= `NotIndelaySlot;
+		end else begin
+			is_in_delayslot_o	<= is_in_delayslot_i;
 		end
 	end
 

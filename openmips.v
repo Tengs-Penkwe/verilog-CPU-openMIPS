@@ -34,6 +34,12 @@ module openmips(
 	wire[`RegBus]			id_reg2_o;
 	wire					id_wreg_o;
 	wire[`RegAddrBus]		id_wd_o;
+	wire					id_is_in_delayslot_o;
+	wire[`RegBus]			id_link_address_o;
+	wire					next_inst_in_delay_slot_o;
+	//ID -> PC: DelaySlot
+	wire					id_branch_flag_o;
+	wire[`RegBus]			branch_target_address;
 
 	//ID/EX -> EX
 	wire[`AluOpBus]			ex_aluop_i;
@@ -42,6 +48,10 @@ module openmips(
 	wire[`RegBus]			ex_reg2_i;
 	wire					ex_wreg_i;
 	wire[`RegAddrBus]		ex_wd_i;
+	wire					ex_is_in_delayslot_i;
+	wire[`RegBus]		ex_link_address_i;
+	//ID/EX -> ID
+	wire					is_in_delayslot_i;
 
 	//EX -> EX/MEM
 	wire					ex_wreg_o;
@@ -102,6 +112,8 @@ module openmips(
 
 	pc_reg pc_reg0(
 		.rst(rst),		.clk(clk),
+		.branch_flag_i(id_branch_flag_o),
+		.branch_target_address_i(branch_target_address),
 		//From Control
 		.stall(stall),
 		//To ROM
@@ -125,20 +137,30 @@ module openmips(
 		.pc_i(id_pc_i),				.inst_i(id_inst_i),
 		//From Regfiles
 		.reg1_data_i(reg1_data),	.reg2_data_i(reg2_data),
-		//To Control
-		.stallreq(stallreq_from_id),
 		/* Data Forward */
 		.ex_wdata_i(ex_wdata_o),	.ex_wd_i(ex_wd_o),
 		.ex_wreg_i(ex_wreg_o),
 		.mem_wdata_i(mem_wdata_o),	.mem_wd_i(mem_wd_o),
 		.mem_wreg_i(mem_wreg_o),
+		//From ID/EX, DelaySlot
+		.is_in_delayslot_i(is_in_delayslot_i),
+
+		//To PC
+		.branch_flag_o(id_branch_flag_o),
+		.branch_target_address_o(branch_target_address),
 		//To Regfiles
 		.reg1_addr_o(reg1_addr),	.reg2_addr_o(reg2_addr),
 		.reg1_read_o(reg1_read),	.reg2_read_o(reg2_read),
 		//To ID/EX
 		.aluop_o(id_aluop_o),		.alusel_o(id_alusel_o),
 		.reg1_o(id_reg1_o),			.reg2_o(id_reg2_o),
-		.wd_o(id_wd_o),				.wreg_o(id_wreg_o)
+		.wd_o(id_wd_o),				.wreg_o(id_wreg_o),
+		
+		.is_in_delayslot_o(id_is_in_delayslot_o),
+		.link_addr_o(id_link_address_o),
+		.next_inst_in_delay_slot_o(next_inst_in_delay_slot_o),
+		//To Control
+		.stallreq(stallreq_from_id)
 	);
 
 	regfile regfile1(
@@ -161,10 +183,18 @@ module openmips(
 		.id_aluop(id_aluop_o),		.id_alusel(id_alusel_o),
 		.id_reg1(id_reg1_o),		.id_reg2(id_reg2_o),
 		.id_wd(id_wd_o),			.id_wreg(id_wreg_o),
-		//Output
+		.id_is_in_delayslot(id_is_in_delayslot_o),
+		.id_link_address(id_link_address_o),
+		.next_inst_in_delay_slot_i(next_inst_in_delay_slot_o),
+
+		//To ID
+		.is_in_delayslot_o(is_in_delayslot_i),
+		//To EX
 		.ex_aluop(ex_aluop_i),		.ex_alusel(ex_alusel_i),
 		.ex_reg1(ex_reg1_i),		.ex_reg2(ex_reg2_i),
-		.ex_wd(ex_wd_i),			.ex_wreg(ex_wreg_i)
+		.ex_wd(ex_wd_i),			.ex_wreg(ex_wreg_i),
+		.ex_is_in_delayslot_o(ex_is_in_delayslot_i),
+		.ex_link_address(ex_link_address_i)
 	);
 
 	ex ex0(
@@ -173,6 +203,8 @@ module openmips(
 		.aluop_i(ex_aluop_i),		.alusel_i(ex_alusel_i),
 		.reg1_i(ex_reg1_i),			.reg2_i(ex_reg2_i),
 		.wd_i(ex_wd_i),				.wreg_i(ex_wreg_i),
+		.is_in_delayslot_i(ex_is_in_delayslot_i),
+		.link_address_i(ex_link_address_i),
 		//From ID/EX, HI-LO 
 		.hi_i(hi),					.lo_i(lo),
 		.wb_hi_i(wb_hi_i),			.wb_lo_i(wb_lo_i),
