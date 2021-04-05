@@ -18,6 +18,10 @@
 `define False_v			1'b0
 `define ChipEnable		1'b1
 `define ChipDisable		1'b0
+`define Branch			1'b1
+`define NotBranch		1'b0
+`define IndelaySlot		1'b1
+`define NotIndelaySlot	1'b0
 
 //************* Macro about specific instruction ************
 //********** Opcode 31~26 **********//
@@ -69,11 +73,25 @@
 `define EXE_SLT			6'b101010
 `define EXE_SLTU		6'b101011
 
+`define EXE_MULT		6'b011000
+`define EXE_MULTU		6'b011001
+
 `define EXE_DIV			6'b011010
 `define EXE_DIVU		6'b011011
 
-`define EXE_MULT		6'b011000
-`define EXE_MULTU		6'b011001
+`define EXE_J			6'b000010
+`define EXE_JAL			6'b000011
+`define EXE_JALR		6'b001001
+`define EXE_JR			6'b001000
+`define EXE_BEQ			6'b000100
+`define EXE_BGTZ		6'b000111
+`define EXE_BLEZ		6'b000110
+`define EXE_BNE			6'b000101
+`define EXE_REGIMM_INST 6'b000001
+	`define EXE_BLTZ		5'b00000
+	`define EXE_BLTZAL		5'b10000
+	`define EXE_BGEZ		5'b00001
+	`define EXE_BGEZAL		5'b10001
 //Special 2 000000=> 6'b011100
 `define EXE_SPEC2_INST	6'b011100
 `define EXE_MUL			6'b000010
@@ -134,6 +152,19 @@
 
 `define EXE_DIV_OP		8'b00011010
 `define EXE_DIVU_OP		8'b00011011
+
+`define EXE_J_OP		8'b01001111
+`define EXE_JAL_OP		8'b01010000
+`define EXE_JALR_OP		8'b00001001
+`define EXE_JR_OP		8'b00001000
+`define EXE_BEQ_OP		8'b01010001
+`define EXE_BGEZ_OP		8'b01000001
+`define EXE_BGEZAL_OP	8'b01001011
+`define EXE_BGTZ_OP		8'b01010100
+`define EXE_BLEZ_OP		8'b01010011
+`define EXE_BLTZ_OP		8'b01000000
+`define EXE_BLTZAL_OP	8'b01001010
+`define EXE_BNE_OP		8'b01010010
 //********** AluSel **********//
 `define EXE_RES_NOP		3'b000
 `define EXE_RES_LOGIC	3'b001
@@ -141,6 +172,7 @@
 `define EXE_RES_MOVE	3'b011
 `define EXE_RES_ARITH	3'b100
 `define EXE_RES_MUL		3'b101
+`define EXE_RES_TRAN	3'b110
 
 //*************** Macro about ROM (instruction inside) ************
 `define InstAddrBus		31:0		//Width of Address Bus of ROM
