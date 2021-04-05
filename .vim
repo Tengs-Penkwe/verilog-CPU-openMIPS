@@ -62,12 +62,12 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 171 - ((21 * winheight(0) + 28) / 56)
+let s:l = 171 - ((55 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 171
-normal! 020|
+normal! 0
 tabedit ./inst_rom.v
 set splitbelow splitright
 set nosplitbelow
@@ -214,12 +214,12 @@ normal! zo
 normal! zo
 201
 normal! zo
-let s:l = 140 - ((34 * winheight(0) + 28) / 56)
+let s:l = 142 - ((36 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-140
-normal! 0
+142
+normal! 075|
 tabedit ./id_ex.v
 set splitbelow splitright
 set nosplitbelow
@@ -280,31 +280,11 @@ normal! zo
 normal! zo
 85
 normal! zo
-91
-normal! zo
-158
-normal! zo
-177
-normal! zo
-180
-normal! zo
-182
-normal! zo
-218
-normal! zo
-232
-normal! zo
-233
-normal! zo
-240
-normal! zo
 261
 normal! zo
 262
 normal! zo
 270
-normal! zo
-271
 normal! zo
 273
 normal! zo
@@ -312,54 +292,14 @@ normal! zo
 normal! zo
 276
 normal! zo
-277
-normal! zo
-279
-normal! zo
-281
-normal! zo
 284
 normal! zo
-285
-normal! zo
-287
-normal! zo
-289
-normal! zo
-299
-normal! zo
-301
-normal! zo
-306
-normal! zo
-314
-normal! zo
-316
-normal! zo
-322
-normal! zo
-323
-normal! zo
-326
-normal! zo
-327
-normal! zo
-329
-normal! zo
-331
-normal! zo
-333
-normal! zo
-335
-normal! zo
-336
-normal! zo
-let s:l = 274 - ((38 * winheight(0) + 28) / 56)
+let s:l = 286 - ((47 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-274
-normal! 013|
+286
+normal! 029|
 wincmd w
 argglobal
 7argu
@@ -425,10 +365,6 @@ normal! zo
 normal! zo
 276
 normal! zo
-278
-normal! zo
-280
-normal! zo
 281
 normal! zo
 284
@@ -474,6 +410,7 @@ set winwidth=1
 exe 'vert 1resize ' . ((&columns * 136 + 89) / 178)
 exe 'vert 2resize ' . ((&columns * 41 + 89) / 178)
 argglobal
+if bufexists("div.v") | buffer div.v | else | edit div.v | endif
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -504,14 +441,14 @@ normal! zo
 normal! zo
 82
 normal! zo
-96
+98
 normal! zo
-let s:l = 49 - ((36 * winheight(0) + 28) / 56)
+let s:l = 83 - ((35 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-49
-normal! 027|
+83
+normal! 046|
 wincmd w
 argglobal
 if bufexists("div.v") | buffer div.v | else | edit div.v | endif
@@ -528,10 +465,77 @@ if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 24
-normal! 016|
+normal! 014|
 wincmd w
 exe 'vert 1resize ' . ((&columns * 136 + 89) / 178)
 exe 'vert 2resize ' . ((&columns * 41 + 89) / 178)
+tabedit ./openmips.v
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
+argglobal
+10argu
+setlocal fdm=indent
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+103
+normal! zo
+171
+normal! zo
+207
+normal! zo
+let s:l = 213 - ((69 * winheight(0) + 28) / 56)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+213
+normal! 038|
+wincmd w
+argglobal
+10argu
+setlocal fdm=indent
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+15
+normal! zo
+103
+normal! zo
+171
+normal! zo
+207
+normal! zo
+217
+normal! zo
+let s:l = 59 - ((34 * winheight(0) + 28) / 56)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+59
+normal! 038|
+wincmd w
+exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
 tabedit ./regfile.v
 set splitbelow splitright
 set nosplitbelow
@@ -682,75 +686,6 @@ exe s:l
 normal! zt
 1
 normal! 018|
-tabedit ./openmips.v
-set splitbelow splitright
-wincmd _ | wincmd |
-vsplit
-1wincmd h
-wincmd w
-set nosplitbelow
-set nosplitright
-wincmd t
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
-exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
-argglobal
-10argu
-setlocal fdm=indent
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-103
-normal! zo
-171
-normal! zo
-207
-normal! zo
-217
-normal! zo
-let s:l = 200 - ((20 * winheight(0) + 28) / 56)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-200
-normal! 032|
-wincmd w
-argglobal
-10argu
-setlocal fdm=indent
-setlocal fde=0
-setlocal fmr={{{,}}}
-setlocal fdi=#
-setlocal fdl=0
-setlocal fml=1
-setlocal fdn=20
-setlocal fen
-15
-normal! zo
-103
-normal! zo
-171
-normal! zo
-207
-normal! zo
-217
-normal! zo
-let s:l = 59 - ((34 * winheight(0) + 28) / 56)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-59
-normal! 038|
-wincmd w
-exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
 tabedit ./openmips_min_sopc.v
 set splitbelow splitright
 set nosplitbelow
@@ -799,12 +734,14 @@ setlocal fen
 normal! zo
 10
 normal! zo
-let s:l = 27 - ((26 * winheight(0) + 28) / 56)
+23
+normal! zo
+let s:l = 24 - ((23 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-27
-normal! 010|
+24
+normal! 030|
 tabnext 8
 set stal=1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
