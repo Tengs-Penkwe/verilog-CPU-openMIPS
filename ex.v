@@ -13,6 +13,8 @@ module ex(
 	// DelaySlot
 	input wire[`RegBus]		link_address_i,
 	input wire				is_in_delayslot_i,
+	// Load & Store
+	input wire[`RegBus]		inst_i,				//! Decide L&S Address
 
 	// From DIV
 	input wire[`DoubleRegBus]div_result_i,
@@ -43,6 +45,10 @@ module ex(
 	output reg[`RegBus]		hi_o,
 	output reg[`RegBus]		lo_o,
 	output reg				whilo_o,
+	// Load & Store
+	output reg[`AluOpBus]	aluop_o,			//! Tell MEM to L&S
+	output reg[`RegBus]		reg2_o,				//! Data to Store or Original Value of Reg to Load
+	output reg[`RegBus]		mem_addr_o,			//! Address of L&S Operation
 
 	//To DIV
 	output reg[`RegBus]		div_opdata1_o,
