@@ -10,6 +10,10 @@ module ex_mem(
 	input wire[`RegBus]		ex_hi,
 	input wire[`RegBus]		ex_lo,
 	input wire				ex_whilo,
+	// Load & Store
+	input wire[`AluOpBus]	ex_aluop,
+	input wire[`RegBus]		ex_reg2,
+	input wire[`RegBus]		ex_mem_addr,
 	
 	/* From Control */
 	input wire[5:0]			stall,
@@ -23,6 +27,10 @@ module ex_mem(
 	output reg[`RegBus]		mem_hi,
 	output reg[`RegBus]		mem_lo,
 	output reg				mem_whilo,
+	// Load & Store
+	output reg[`AluOpBus]	mem_aluop,			//! Tell MEM to L&S
+	output reg[`RegBus]		mem_reg2,			//! Data to Store or Original Value of Reg to Load
+	output reg[`RegBus]		mem_mem_addr,		//! Address of L&S Operation
 	/* Multiple Cycle Instruction */
 	output reg[`DoubleRegBus] hilo_o,
 	output reg[1:0]			cnt_o

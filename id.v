@@ -32,14 +32,14 @@ module id(
 	//ALU operation
 	output reg[`AluOpBus]		aluop_o,
 	output reg[`AluSelBus]		alusel_o,
-
 	//Read Info from Regfile and send to ID_EX
 	output reg[`RegBus]			reg1_o,
 	output reg[`RegBus]			reg2_o,
-
 	//Which Reg to write
 	output reg[`RegAddrBus]		wd_o,
 	output reg					wreg_o,
+	//Which Instruction is in ID: prepare for the Load & Store Opration
+	output reg[`RegBus]			inst_o,
 
 	/********** DelaySlot **********/ 
 	//To ID
@@ -54,7 +54,6 @@ module id(
 
 	/* To Control Module */
 	output wire					stallreq
-
 );
 
 	/* Get Opration Code */
@@ -89,7 +88,10 @@ module id(
 	wire [`RegBus] pc_8		= pc_i + 8; 
 	wire [`RegBus] pc_4		= pc_i + 4; 
 	wire [`RegBus] pc_jump	= {pc_4[31:28], inst_i[25:0], 2'b00};
-	wire [`RegBus] pc_branch= {pc_4 + {14{inst_i[15:0]}}, inst_i[15:0], 2'b00};
+	wire [`RegBus] pc_branch= pc_4 + {{14{inst_i[15]}},inst_i[15:0],2'b00};
+
+	/* Load & Store */
+	assign inst_o = inst_i;
 
 	/********************* 1.Instruction Decipher ********************
 	* In this Stage, OP1(31~26) is read, then we send instruction 

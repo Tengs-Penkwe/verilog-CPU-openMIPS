@@ -32,6 +32,8 @@ module id_ex(
 	//Transfer
 	output reg[`RegBus]		ex_link_address,
 	output reg				ex_is_in_delayslot_o,
+	//Load & Store
+	output reg[`RegBus]		ex_inst,
 
 	/* To PC */
 	output reg				is_in_delayslot_o
