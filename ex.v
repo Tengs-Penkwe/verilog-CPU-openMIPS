@@ -63,6 +63,11 @@ module ex(
 	/* To Control */
 	output reg				stallreq
 );
+
+	/********************** Pass ***************************/
+	assign aluop_o = aluop_i;
+	assign mem_addr_o = reg1_i + {{16{inst_i[15]}}, inst_i[15:0]};
+	assign reg2_o = reg2_i;
 	
 	/********************* Save The Result of Operation *************/
 		reg[`RegBus]			logicout;

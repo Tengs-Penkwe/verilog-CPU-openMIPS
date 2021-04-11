@@ -17,6 +17,8 @@ module id_ex(
 	input wire[`RegBus]		id_link_address,
 	input wire				id_is_in_delayslot,
 	input wire				next_inst_in_delay_slot_i,
+	//Load & Store
+	input wire[`RegBus]		id_inst,
 
 	/* From Control */
 	input wire[5:0]			stall,
@@ -50,6 +52,7 @@ module id_ex(
 			ex_link_address	<= `ZeroWord;
 			ex_is_in_delayslot_o	<= `NotIndelaySlot;
 			is_in_delayslot_o		<= `NotIndelaySlot;
+			ex_inst			<= `ZeroWord;
 		end else if (stall[2] == `NoStop ) begin
 			ex_alusel		<= id_alusel;
 			ex_aluop		<= id_aluop;
@@ -60,6 +63,7 @@ module id_ex(
 			ex_link_address	<= id_link_address;
 			ex_is_in_delayslot_o	<= id_is_in_delayslot;
 			is_in_delayslot_o		<= next_inst_in_delay_slot_i;
+			ex_inst			<= id_inst;
 		end 
 	end
 
