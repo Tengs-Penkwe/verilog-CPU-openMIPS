@@ -197,6 +197,19 @@ module id(
 				`EXE_SLTI:	`SET_INST(`EXE_SLT_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
 				`EXE_SLTIU:	`SET_INST(`EXE_SLTU_OP,	`EXE_RES_ARITH,1,rs,0,rt,1,rt,sgn_imm,0);
 
+				`EXE_LB:	`SET_INST(`EXE_LB_OP,	`EXE_RES_MEM,  1,rs,0,rt,1,rt,0	,0);
+				`EXE_LBU:	`SET_INST(`EXE_LBU_OP,	`EXE_RES_MEM,  1,rs,0,rt,1,rt,0	,0);
+				`EXE_LH:	`SET_INST(`EXE_LH_OP,	`EXE_RES_MEM,  1,rs,0,rt,1,rt,0	,0);
+				`EXE_LHU:	`SET_INST(`EXE_LHU_OP,	`EXE_RES_MEM,  1,rs,0,rt,1,rt,0	,0);
+				`EXE_LW:	`SET_INST(`EXE_LW_OP,	`EXE_RES_MEM,  1,rs,0,rt,1,rt,0	,0);
+				`EXE_LWL:	`SET_INST(`EXE_LWL_OP,	`EXE_RES_MEM,  1,rs,1,rt,1,rt,0	,0);
+				`EXE_LWR:	`SET_INST(`EXE_LWR_OP,	`EXE_RES_MEM,  1,rs,1,rt,1,rt,0	,0);
+				`EXE_SB:	`SET_INST(`EXE_SB_OP,	`EXE_RES_MEM,  1,rs,1,rt,0,rd,0	,0);
+				`EXE_SH:	`SET_INST(`EXE_SH_OP,	`EXE_RES_MEM,  1,rs,1,rt,0,rd,0	,0);
+				`EXE_SW:	`SET_INST(`EXE_SW_OP,	`EXE_RES_MEM,  1,rs,1,rt,0,rd,0	,0);
+				`EXE_SWL:	`SET_INST(`EXE_SWL_OP,	`EXE_RES_MEM,  1,rs,1,rt,0,rd,0	,0);
+				`EXE_SWR:	`SET_INST(`EXE_SWR_OP,	`EXE_RES_MEM,  1,rs,1,rt,0,rd,0	,0);
+
 				`EXE_J: begin
 							`SET_INST(`EXE_J_OP,	`EXE_RES_TRAN, 0,rs,0,rt,0,rd	,0	,0);
 							`SET_BRANCH(1'b1, pc_jump, 32'h0,	 1'b1);

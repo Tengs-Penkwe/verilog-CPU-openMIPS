@@ -204,6 +204,7 @@
 `define EXE_RES_ARITH	3'b100
 `define EXE_RES_MUL		3'b101
 `define EXE_RES_TRAN	3'b110
+`define EXE_RES_MEM		3'b111
 
 //*************** Macro about ROM (instruction inside) ************
 `define InstAddrBus		31:0		//Width of Address Bus of ROM
@@ -227,7 +228,6 @@
 `define RegNum			32			//Number of G-Regs 2^5=32
 `define RegNumLog2		5				
 `define NOPRegAddr		5'b00000	//Reg r0 === 0, for special utility
-
 
 //*************** Divide ************
 `define DivFree			2'b00

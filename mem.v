@@ -28,26 +28,71 @@ module mem(
 	output reg[3:0]			mem_sel_o,		//! Which Bit
 	output reg[`RegBus]		mem_data_o,		//! Data to Write
 	output reg				mem_ce_o		//! RAM Enable
-
-
 );
+
+		`define SET_MEM(i_wdata, i_mem_we, i_mem_sel, i_mem_addr, i_mem_data, i_mem_ce) if(1) begin \
+			wdata_o     <= i_wdata    ; \
+			mem_we_o    <= i_mem_we   ; \
+			mem_sel_o   <= i_mem_sel  ; \
+			mem_addr_o  <= i_mem_addr ; \
+			mem_data_o  <= i_mem_data ; \
+			mem_ce_o    <= i_mem_ce   ; \
+		end else if(0)
 
 	always @(*) begin
 		if (rst==`RstEnable) begin
 			wd_o		<= `NOPRegAddr;
 			wreg_o		<= `WriteDisable;
-			wdata_o		<= `ZeroWord;
 			hi_o		<= `ZeroWord;
 			lo_o		<= `ZeroWord;
 			whilo_o		<= `WriteDisable;
+			`SET_MEM(`ZeroWord, `WriteDisable, 4'b0000, `ZeroWord, `ZeroWord, `ChipDisable);
 		end else begin
 			wd_o		<= wd_i;
 			wreg_o		<= wreg_i;
-			wdata_o		<= wdata_i;
 			hi_o		<= hi_i;
 			lo_o		<= lo_i;
 			whilo_o		<= whilo_i;
-		end
-	end
+			`SET_MEM(wdata_i, 0, 4'b1111, 0, 0, 0);
+			case(aluop_i)
+				`EXE_LB_OP: case(mem_addr_i[1:0])
+					2'b00:	`SET_MEM()
+					2'b01:	
+					2'b10:	
+					2'b11:	
+				endcase
+				`EXE_LB_OP: case(mem_addr_i[1:0])
+					2'b00:	
+					2'b01:	
+					2'b10:	
+					2'b11:	
+				endcase
+				`EXE_LB_OP: case(mem_addr_i[1:0])
+					2'b00:	
+					2'b01:	
+					2'b10:	
+					2'b11:	
+				endcase
+				`EXE_LB_OP: case(mem_addr_i[1:0])
+					2'b00:	
+					2'b01:	
+					2'b10:	
+					2'b11:	
+				endcase
+				`EXE_LB_OP: case(mem_addr_i[1:0])
+					2'b00:	
+					2'b01:	
+					2'b10:	
+					2'b11:	
+				endcase
+				`EXE_LB_OP: case(mem_addr_i[1:0])
+					2'b00:	
+					2'b01:	
+					2'b10:	
+					2'b11:	
+				endcase
+			endcase	//aluop_i
+		end			//if
+	end				//always
 
 endmodule

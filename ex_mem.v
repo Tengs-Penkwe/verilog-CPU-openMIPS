@@ -46,6 +46,9 @@ module ex_mem(
 			mem_whilo	<= `WriteDisable;
 			hilo_o		<= {32'b0, 32'b0};
 			cnt_o		<= 2'b00;
+			mem_aluop	<= `EXE_NOP_OP;
+			mem_reg2	<= `ZeroWord;
+			mem_mem_addr<= `ZeroWord;
 		end else if (stall[3] == `Stop && stall[4] == `NoStop) begin
 			mem_wd		<= `NOPRegAddr;
 			mem_wreg	<= `WriteDisable;
@@ -55,6 +58,9 @@ module ex_mem(
 			mem_whilo	<= `WriteDisable;
 			hilo_o		<= hilo_i;
 			cnt_o		<= cnt_i;
+			mem_aluop	<= `EXE_NOP_OP;
+			mem_reg2	<= `ZeroWord;
+			mem_mem_addr<= `ZeroWord;
 		end else if (stall[3] == `NoStop) begin
 			mem_wd		<= ex_wd;
 			mem_wreg	<= ex_wreg;
@@ -64,6 +70,9 @@ module ex_mem(
 			mem_whilo	<= ex_whilo;
 			hilo_o		<= {32'b0, 32'b0};
 			cnt_o		<= 2'b00;
+			mem_aluop	<= ex_aluop;
+			mem_reg2	<= ex_reg2;
+			mem_mem_addr<= ex_mem_addr;
 //		end	else begin 	
 //			hilo_i		<= hilo_i;
 //			cnt_o		<= cnt_i;
