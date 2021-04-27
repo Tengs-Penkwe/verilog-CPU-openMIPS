@@ -69,7 +69,7 @@ normal! zo
 normal! zo
 110
 normal! zo
-let s:l = 209 - ((49 * winheight(0) + 26) / 53)
+let s:l = 209 - ((40 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -97,7 +97,7 @@ setlocal fdn=20
 setlocal fen
 4
 normal! zo
-let s:l = 11 - ((10 * winheight(0) + 26) / 53)
+let s:l = 11 - ((9 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -130,7 +130,7 @@ normal! zo
 normal! zo
 17
 normal! zo
-let s:l = 1 - ((0 * winheight(0) + 26) / 53)
+let s:l = 1 - ((0 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -171,7 +171,7 @@ normal! zo
 normal! zo
 32
 normal! zo
-let s:l = 32 - ((27 * winheight(0) + 26) / 53)
+let s:l = 32 - ((26 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -198,7 +198,7 @@ setlocal fdn=20
 setlocal fen
 4
 normal! zo
-let s:l = 4 - ((3 * winheight(0) + 26) / 53)
+let s:l = 4 - ((3 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -263,16 +263,12 @@ normal! zo
 normal! zo
 171
 normal! zo
-131
+132
 normal! zc
 177
 normal! zo
 178
 normal! zo
-178
-normal! zc
-177
-normal! zc
 226
 normal! zo
 226
@@ -297,12 +293,12 @@ normal! zo
 normal! zo
 286
 normal! zo
-let s:l = 195 - ((84 * winheight(0) + 26) / 53)
+let s:l = 181 - ((3 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-195
-normal! 017|
+181
+normal! 068|
 tabedit ./id_ex.v
 set splitbelow splitright
 set nosplitbelow
@@ -328,7 +324,7 @@ normal! zo
 normal! zo
 45
 normal! zo
-let s:l = 36 - ((28 * winheight(0) + 26) / 53)
+let s:l = 36 - ((27 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -347,8 +343,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 95 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 82 + 89) / 178)
+exe 'vert 1resize ' . ((&columns * 58 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 119 + 89) / 178)
 argglobal
 7argu
 setlocal fdm=indent
@@ -359,7 +355,7 @@ setlocal fdl=1
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 48 - ((43 * winheight(0) + 26) / 53)
+let s:l = 48 - ((41 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -416,15 +412,15 @@ normal! zo
 normal! zo
 337
 normal! zo
-let s:l = 58 - ((0 * winheight(0) + 26) / 53)
+let s:l = 274 - ((171 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-58
+274
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 95 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 82 + 89) / 178)
+exe 'vert 1resize ' . ((&columns * 58 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 119 + 89) / 178)
 tabedit div.v
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -438,8 +434,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 105 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 72 + 89) / 178)
+exe 'vert 1resize ' . ((&columns * 65 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 112 + 89) / 178)
 argglobal
 if bufexists("div.v") | buffer div.v | else | edit div.v | endif
 setlocal fdm=indent
@@ -474,7 +470,7 @@ normal! zo
 normal! zo
 98
 normal! zo
-let s:l = 83 - ((34 * winheight(0) + 26) / 53)
+let s:l = 83 - ((32 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -491,15 +487,15 @@ setlocal fdl=7
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 24 - ((0 * winheight(0) + 26) / 53)
+let s:l = 24 - ((0 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 24
-normal! 04|
+normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 105 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 72 + 89) / 178)
+exe 'vert 1resize ' . ((&columns * 65 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 112 + 89) / 178)
 tabedit ./regfile.v
 set splitbelow splitright
 set nosplitbelow
@@ -519,7 +515,7 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 2 - ((1 * winheight(0) + 26) / 53)
+let s:l = 2 - ((1 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -544,7 +540,7 @@ setlocal fdl=3
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 13 - ((12 * winheight(0) + 26) / 53)
+let s:l = 13 - ((11 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -571,12 +567,36 @@ setlocal fdn=20
 setlocal fen
 4
 normal! zo
-let s:l = 30 - ((29 * winheight(0) + 26) / 53)
+33
+normal! zo
+33
+normal! zo
+34
+normal! zo
+43
+normal! zo
+51
+normal! zo
+58
+normal! zo
+59
+normal! zo
+65
+normal! zo
+71
+normal! zo
+75
+normal! zo
+80
+normal! zo
+86
+normal! zo
+let s:l = 69 - ((18 * winheight(0) + 25) / 50)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-30
-normal! 058|
+69
+normal! 023|
 tabedit ./mem_wb.v
 set splitbelow splitright
 set nosplitbelow
@@ -596,7 +616,7 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 26) / 53)
+let s:l = 1 - ((0 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -621,7 +641,7 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 26) / 53)
+let s:l = 1 - ((0 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -640,8 +660,10 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 95 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 82 + 89) / 178)
+exe '1resize ' . ((&lines * 49 + 26) / 53)
+exe 'vert 1resize ' . ((&columns * 58 + 89) / 178)
+exe '2resize ' . ((&lines * 49 + 26) / 53)
+exe 'vert 2resize ' . ((&columns * 51 + 89) / 178)
 argglobal
 10argu
 setlocal fdm=indent
@@ -652,12 +674,12 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 197 - ((84 * winheight(0) + 26) / 53)
+let s:l = 197 - ((84 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 197
-normal! 043|
+normal! 01|
 wincmd w
 argglobal
 10argu
@@ -681,15 +703,17 @@ normal! zo
 normal! zo
 311
 normal! zo
-let s:l = 52 - ((30 * winheight(0) + 26) / 53)
+let s:l = 52 - ((28 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 52
 normal! 014|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 95 + 89) / 178)
-exe 'vert 2resize ' . ((&columns * 82 + 89) / 178)
+exe '1resize ' . ((&lines * 49 + 26) / 53)
+exe 'vert 1resize ' . ((&columns * 58 + 89) / 178)
+exe '2resize ' . ((&lines * 49 + 26) / 53)
+exe 'vert 2resize ' . ((&columns * 51 + 89) / 178)
 tabedit ./ctrl.v
 set splitbelow splitright
 set nosplitbelow
@@ -709,7 +733,7 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 26) / 53)
+let s:l = 1 - ((0 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -734,7 +758,7 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 26) / 53)
+let s:l = 1 - ((0 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -767,13 +791,13 @@ normal! zo
 normal! zo
 23
 normal! zo
-let s:l = 28 - ((26 * winheight(0) + 26) / 53)
+let s:l = 28 - ((24 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 28
 normal! 010|
-tabnext 6
+tabnext 12
 set stal=1
 if exists('s:wipebuf') && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

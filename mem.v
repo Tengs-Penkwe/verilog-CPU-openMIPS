@@ -56,40 +56,37 @@ module mem(
 			`SET_MEM(wdata_i, 0, 4'b1111, 0, 0, 0);
 			case(aluop_i)
 				`EXE_LB_OP: case(mem_addr_i[1:0])
-					2'b00:	`SET_MEM()
-					2'b01:	
-					2'b10:	
-					2'b11:	
+					2'b00:	`SET_MEM( ({{24{mem_data_i[31]}},mem_data_i[31:24]}), 0, 4'b1000, mem_addr_i, 0, 1);
+					2'b01:	`SET_MEM( ({{24{mem_data_i[23]}},mem_data_i[23:16]}), 0, 4'b0100, mem_addr_i, 0, 1);
+					2'b10:	`SET_MEM( ({{24{mem_data_i[15]}},mem_data_i[15: 8]}), 0, 4'b0010, mem_addr_i, 0, 1);
+					2'b11:	`SET_MEM( ({{24{mem_data_i[ 7]}},mem_data_i[ 7: 0]}), 0, 4'b0001, mem_addr_i, 0, 1);
 				endcase
-				`EXE_LB_OP: case(mem_addr_i[1:0])
-					2'b00:	
-					2'b01:	
-					2'b10:	
-					2'b11:	
+				`EXE_LBU_OP: case(mem_addr_i[1:0])
+					2'b00:	`SET_MEM( ({{24{1'b0}},mem_data_i[31:24]}), 0, 4'b1000, mem_addr_i, 0, 1);
+					2'b01:	`SET_MEM( ({{24{1'b0}},mem_data_i[23:16]}), 0, 4'b0100, mem_addr_i, 0, 1);
+					2'b10:	`SET_MEM( ({{24{1'b0}},mem_data_i[15: 8]}), 0, 4'b0010, mem_addr_i, 0, 1);
+					2'b11:	`SET_MEM( ({{24{1'b0}},mem_data_i[ 7: 0]}), 0, 4'b0001, mem_addr_i, 0, 1);
 				endcase
-				`EXE_LB_OP: case(mem_addr_i[1:0])
-					2'b00:	
-					2'b01:	
-					2'b10:	
-					2'b11:	
+				`EXE_LH_OP: case(mem_addr_i[1:0])
+					2'b00:	`SET_MEM( ({{16{mem_data_i[31]}},mem_data_i[31:24]}), 0, 4'b1100, mem_addr_i, 0, 1);
+					2'b10:	`SET_MEM( ({{16{mem_data_i[15]}},mem_data_i[15: 8]}), 0, 4'b0011, mem_addr_i, 0, 1);
 				endcase
-				`EXE_LB_OP: case(mem_addr_i[1:0])
-					2'b00:	
-					2'b01:	
-					2'b10:	
-					2'b11:	
+				`EXE_LHU_OP: case(mem_addr_i[1:0])
+					2'b00:	`SET_MEM( ({{16{1'b0}},mem_data_i[31:24]}), 0, 4'b1000, mem_addr_i, 0, 1);
+					2'b10:	`SET_MEM( ({{16{1'b0}},mem_data_i[15: 8]}), 0, 4'b0010, mem_addr_i, 0, 1);
 				endcase
-				`EXE_LB_OP: case(mem_addr_i[1:0])
-					2'b00:	
-					2'b01:	
-					2'b10:	
-					2'b11:	
+				`EXE_LW_OP: `SET_MEM(mem_data_i, 0, 4'b1111, mem_addr_i, 0, 1);
+				`EXE_LWL_OP: case(mem_addr_i[1:0])
+					2'b00:	`SET_MEM( (mem_data_i[31:0]				 ), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
+					2'b01:	`SET_MEM(({mem_data_i[23:0],reg2_i[7 :0]}), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
+					2'b10:	`SET_MEM(({mem_data_i[15:0],reg2_i[15:0]}), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
+					2'b11:	`SET_MEM(({mem_data_i[7 :0],reg2_i[23:0]}), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
 				endcase
-				`EXE_LB_OP: case(mem_addr_i[1:0])
-					2'b00:	
-					2'b01:	
-					2'b10:	
-					2'b11:	
+				`EXE_LWR_OP: case(mem_addr_i[1:0])
+					2'b00:	`SET_MEM(({reg2_i[31: 8],mem_data_i[ 7:0]}), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
+					2'b01:	`SET_MEM(({reg2_i[31:16],mem_data_i[15:0]}), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
+					2'b10:	`SET_MEM(({reg2_i[31:24],mem_data_i[23:0]}), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
+					2'b11:	`SET_MEM( (mem_data_i[31:0]	  			  ), 0, 4'b1111, ({mem_addr_i[31:2],2'b00}), 0, 1);
 				endcase
 			endcase	//aluop_i
 		end			//if
