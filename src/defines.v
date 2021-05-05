@@ -215,7 +215,7 @@
 //*************** Macro about RAM (data inside) ************
 `define DataAddrBus		31:0
 `define DataBus			31:0
-`define DataMemNum		131071
+`define DataMemNum		131072
 `define DataMemNumLog2	17
 `define ByteWidth		7:0
 

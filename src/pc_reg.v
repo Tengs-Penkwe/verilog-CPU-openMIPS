@@ -29,7 +29,7 @@ module pc_reg(
 			if(branch_flag_i == `Branch)
 				pc	<= branch_target_address_i;
 			else
-				pc <= pc + 4'h4;
+				pc	<= pc + 32'h4;
 		end
 	end
 	

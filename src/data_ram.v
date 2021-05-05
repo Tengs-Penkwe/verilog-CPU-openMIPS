@@ -31,9 +31,9 @@ module data_ram(
 
 	/* Load Data*/
 	always @(*) begin
-		if (ce == `ChipDisable) 	data_o	<= `ZeroWord;
-		else if(we==`WriteDisable)	data_o	<= {bank3[saddr], bank2[saddr], bank1[saddr], bank0[saddr]};
-		else						data_o	<= `ZeroWord;
+		if (ce == `ChipDisable) 	data_o	= `ZeroWord;
+		else if(we==`WriteDisable)	data_o	= {bank3[saddr], bank2[saddr], bank1[saddr], bank0[saddr]};
+		else						data_o	= `ZeroWord;
 	end
 
 endmodule

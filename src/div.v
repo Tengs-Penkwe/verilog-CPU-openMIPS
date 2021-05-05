@@ -46,7 +46,7 @@ module div(
 							cnt		<= 6'b000000;
 							temp_op1 = (signed_div_i==1'b1 && opdata1_i[31]==1'b1) ? (~opdata1_i+1):(opdata1_i);
 							temp_op2 = (signed_div_i==1'b1 && opdata2_i[31]==1'b1) ? (~opdata2_i+1):(opdata2_i);
-							dividend	<= {32'h0, 32'h0};
+							dividend	<= {1'h0, 32'h0, 32'h0};
 							dividend[32:1]<= temp_op1;
 							divisor		<= temp_op2;
 						end
@@ -59,7 +59,7 @@ module div(
 				//Enter DivEnd state, set results as 0
 				//*************************************************
 				`DivByZero: begin
-					dividend		<= {32'h0, 32'h0};
+					dividend		<= {1'h0, 32'h0, 32'h0};
 					state			<= `DivEnd;
 				end
 				//******************** DivOn *********************

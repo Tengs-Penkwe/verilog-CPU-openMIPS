@@ -12,9 +12,9 @@ module inst_rom(
 
 	always @(*) begin
 		if (ce==`ChipDisable) begin
-			inst		<= `ZeroWord;
+			inst		= `ZeroWord;
 		end else begin
-			inst		<= inst_mem[addr[`InstMemNumLog2+1:2]];
+			inst		= inst_mem[addr[`InstMemNumLog2+1:2]];
 		end
 	end
 

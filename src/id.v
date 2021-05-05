@@ -39,7 +39,7 @@ module id(
 	output reg[`RegAddrBus]		wd_o,
 	output reg					wreg_o,
 	//Which Instruction is in ID: prepare for the Load & Store Opration
-	output reg[`RegBus]			inst_o,
+	output wire[`RegBus]			inst_o,
 
 	/********** DelaySlot **********/ 
 	//To ID
@@ -99,23 +99,23 @@ module id(
 	***************************************************************/
 	
 		`define SET_INST(i_aluop, i_alusel, i_read1, i_reg1_addr, i_read2, i_reg2_addr, i_wreg, i_wd, i_imm, i_inst_valid) if(1) begin \
-			aluop_o       <=  i_aluop       ; \
-			alusel_o      <=  i_alusel      ; \
-			reg1_read_o   <=  i_read1       ; \
-			reg1_addr_o   <=  i_reg1_addr   ; \
-			reg2_read_o   <=  i_read2       ; \
-			reg2_addr_o   <=  i_reg2_addr   ; \
-			wreg_o        <=  i_wreg        ; \
-			wd_o	      <=  i_wd          ; \
-			imm           <=  i_imm         ; \
-			inst_valid    <=  i_inst_valid  ; \
+			aluop_o       =  i_aluop       ; \
+			alusel_o      =  i_alusel      ; \
+			reg1_read_o   =  i_read1       ; \
+			reg1_addr_o   =  i_reg1_addr   ; \
+			reg2_read_o   =  i_read2       ; \
+			reg2_addr_o   =  i_reg2_addr   ; \
+			wreg_o        =  i_wreg        ; \
+			wd_o	      =  i_wd          ; \
+			imm           =  i_imm         ; \
+			inst_valid    =  i_inst_valid  ; \
 		end else if(0)
 		/* Transfer Instruction */
 		`define SET_BRANCH(i_branch_flag, i_branch_target_addr, i_link_addr, i_next_in_delay_slot) if(1) begin \
-			branch_flag_o         		<=  i_branch_flag         ; \
-			branch_target_address_o		<=  i_branch_target_addr  ; \
-			link_addr_o           		<=  i_link_addr           ; \
-			next_inst_in_delay_slot_o	<=  i_next_in_delay_slot  ; \
+			branch_flag_o         		=  i_branch_flag         ; \
+			branch_target_address_o		=  i_branch_target_addr  ; \
+			link_addr_o           		=  i_link_addr           ; \
+			next_inst_in_delay_slot_o	=  i_next_in_delay_slot  ; \
 		end else if(0)
 	/* Instruction Decipher */
 	always @(*) begin 
@@ -261,42 +261,42 @@ module id(
 	/********************* 2.Get the Source Operators ********************/
 	always @(*) begin
 		if(rst==`RstEnable) begin
-			reg1_o		<= `ZeroWord;
+			reg1_o		= `ZeroWord;
 		end else if((reg1_read_o==1'b1) && (ex_wreg_i==1'b1) && (reg1_addr_o==ex_wd_i)) begin
-			reg1_o		<= ex_wdata_i;
+			reg1_o		= ex_wdata_i;
 		end else if((reg1_read_o==1'b1) && (mem_wreg_i==1'b1) && (reg1_addr_o==mem_wd_i)) begin
-			reg1_o		<= mem_wdata_i;
+			reg1_o		= mem_wdata_i;
 		end else if(reg1_read_o == 1'b1) begin
-			reg1_o 		<= reg1_data_i;
+			reg1_o 		= reg1_data_i;
 		end else if(reg1_read_o == 1'b0) begin
-			reg1_o 		<= imm;
+			reg1_o 		= imm;
 		end else begin
-			reg1_o		<= `ZeroWord;
+			reg1_o		= `ZeroWord;
 		end
 	end
 	
 	always @(*) begin
 		if(rst==`RstEnable) begin
-			reg2_o		<= `ZeroWord;
+			reg2_o		= `ZeroWord;
 		end else if((reg2_read_o==1'b1) && (ex_wreg_i==1'b1) && (reg2_addr_o==ex_wd_i)) begin
-			reg2_o		<= ex_wdata_i;
+			reg2_o		= ex_wdata_i;
 		end else if((reg2_read_o==1'b1) && (mem_wreg_i==1'b1) && (reg2_addr_o==mem_wd_i)) begin
-			reg2_o		<= mem_wdata_i;
+			reg2_o		= mem_wdata_i;
 		end else if(reg2_read_o == 1'b1) begin
-			reg2_o 		<= reg2_data_i;
+			reg2_o 		= reg2_data_i;
 		end else if(reg2_read_o == 1'b0) begin
-			reg2_o 		<= imm;
+			reg2_o 		= imm;
 		end else begin
-			reg2_o		<= `ZeroWord;
+			reg2_o		= `ZeroWord;
 		end
 	end
 
 	//! DelaySlot 
 	always @(*) begin
 		if(rst == `RstEnable) begin
-			is_in_delayslot_o	<= `NotIndelaySlot;
+			is_in_delayslot_o	= `NotIndelaySlot;
 		end else begin
-			is_in_delayslot_o	<= is_in_delayslot_i;
+			is_in_delayslot_o	= is_in_delayslot_i;
 		end
 	end
 

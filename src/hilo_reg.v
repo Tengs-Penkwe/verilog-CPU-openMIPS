@@ -1,4 +1,5 @@
 `timescale 1ns/1ps
+`include "defines.v"
 module hilo_reg(
 	input wire			rst,
 	input wire			clk,
