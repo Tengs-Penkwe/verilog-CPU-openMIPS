@@ -241,18 +241,24 @@ module id(
 							if(reg1_o[31]==1'b0)	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
 						end
 						`EXE_BGEZAL: begin
-							`SET_INST(`EXE_BGEZAL_OP,`EXE_RES_TRAN,1,rs,0,rt,1,5'd31,0   ,0);
-							if(reg1_o[31]==1'b0)	`SET_BRANCH(1'b1, pc_branch, pc_8,	1'b1);
+							`SET_INST(`EXE_BGEZAL_OP,`EXE_RES_TRAN,1,rs,0,rt,0,5'd31,0   ,0);
+							if(reg1_o[31]==1'b0) begin
+								wreg_o = `WriteEnable;
+								`SET_BRANCH(1'b1, pc_branch, pc_8,	1'b1);
+							end
 						end
 						`EXE_BLTZ: begin
 							`SET_INST(`EXE_BLTZ_OP,	`EXE_RES_TRAN, 1,rs,0,rt,0,rd	,0   ,0);
 							if(reg1_o[31]==1'b1)	`SET_BRANCH(1'b1, pc_branch, 32'h0,	1'b1);
 						end
 						`EXE_BLTZAL: begin
-							`SET_INST(`EXE_BLTZAL_OP,`EXE_RES_TRAN,1,rs,0,rt,1,5'd31,0   ,0);
-							if(reg1_o[31]==1'b1)	`SET_BRANCH(1'b1, pc_branch, pc_8,	1'b1);
-						end
-					endcase
+							`SET_INST(`EXE_BLTZAL_OP,`EXE_RES_TRAN,1,rs,0,rt,0,5'd31,0   ,0);
+							if(reg1_o[31]==1'b1) begin
+								wreg_o = `WriteEnable;
+								`SET_BRANCH(1'b1, pc_branch, pc_8,	1'b1);
+							end
+						end		
+					endcase  	//case(rt)
 				end
 			endcase	//case(op)
 		end			//if
