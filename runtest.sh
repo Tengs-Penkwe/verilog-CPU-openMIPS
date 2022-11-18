@@ -7,7 +7,7 @@ mkdir -p ../test/waveform/
 compile_all_test()
 {
 	cd ../src
-	xargs -P 0 -I {} sh -c ' eval "$1"' - {} <<'EOF'
+	xargs -P 1 -I {} sh -c ' eval "$1"' - {} <<'EOF'
 	iverilog -s ori_forwarding_test     -o  ../test/out/ori_forwarding_test.out      ../src/*.v  ../test/ori_forwarding_test.v
 	iverilog -s inst_logic_test         -o  ../test/out/inst_logic_test.out          ../src/*.v  ../test/inst_logic_test.v
 	iverilog -s inst_shift_test         -o  ../test/out/inst_shift_test.out          ../src/*.v  ../test/inst_shift_test.v
@@ -24,7 +24,7 @@ EOF
 
 simulation() {
 	cd ../src
-	xargs -P 0 -I {} sh -c ' eval "$1"' - {} <<'EOF'
+	xargs -P 1 -I {} sh -c ' eval "$1"' - {} <<'EOF'
     vvp ../test/out/ori_forwarding_test.out
     vvp ../test/out/inst_logic_test.out
     vvp ../test/out/inst_shift_test.out
