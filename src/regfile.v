@@ -30,10 +30,13 @@ module regfile(
 	* Write what we get from the last stage
 	***************************************************************/
 
-	initial begin
-		for (integer i=0;i<=31;i=i+1)
-			regs[i] = 32'h0;
-	end
+    /************** Initalization ************** 
+	* Initialize all data inside register to 0
+	* *****************************/ 
+	//initial begin
+		//for (integer i=0;i<=31;i=i+1)
+			//regs[i] = 32'h0;
+	//end
 
 	always @(posedge clk) begin
 		if (rst==`RstDisable) begin
